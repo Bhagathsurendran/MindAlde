@@ -1,0 +1,15 @@
+UNPREFIXED ENDPOINTS FOUND:
+- logout mapped in 5 files. e.g. templates\admin_dashboard.html
+- selfcare_suggestions mapped in 1 files. e.g. templates\caretaker_dashboard.html
+- caretaker_therapist_suggestions mapped in 1 files. e.g. templates\caretaker_dashboard.html
+- quiz_page mapped in 3 files. e.g. templates\chatbot.html
+- update_therapist mapped in 1 files. e.g. templates\edit_therapist.html
+- add_quiz mapped in 2 files. e.g. templates\manage_quiz.html
+- add_therapist mapped in 1 files. e.g. templates\manage_therapists1.html
+- verify_therapist_account mapped in 1 files. e.g. templates\manage_therapists1.html
+- reject_therapist_account mapped in 1 files. e.g. templates\manage_therapists1.html
+- submit_quiz mapped in 1 files. e.g. templates\quiz.html
+- home mapped in 1 files. e.g. templates\register.html
+- accept_appointment mapped in 1 files. e.g. templates\therapist_dashboard.html
+- reject_appointment mapped in 1 files. e.g. templates\therapist_dashboard.html
+- request_appointment mapped in 1 files. e.g. templates\therapist_suggestions.html

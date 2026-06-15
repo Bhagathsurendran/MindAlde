@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Therapist Suggestions - MindAIde</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --teal: #0a9396; --teal-dark: #005f73; --teal-light: #94d2bd;
+      --navy: #0d1b2a; --white: #ffffff; --light: #f3f4f6;
+      --text: #1f2937; --text-muted: #6b7280; --border: #e5e7eb;
+      --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:var(--light); min-height:100vh; }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      background:var(--navy); padding:0 2rem;
+      display:flex; align-items:center; justify-content:space-between;
+      height:64px; position:sticky; top:0; z-index:100;
+      box-shadow:0 2px 12px rgba(0,0,0,0.25);
+    }
+    .nav-brand { display:flex; align-items:center; gap:0.6rem; text-decoration:none; }
+    .nav-brand i { font-size:1.3rem; color:var(--teal-light); }
+    .nav-brand span { font-size:1.2rem; font-weight:800; color:var(--white); }
+    .btn-back {
+      display:flex; align-items:center; gap:0.4rem;
+      background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
+      color:rgba(255,255,255,0.8); padding:0.45rem 1rem; border-radius:8px;
+      text-decoration:none; font-size:0.85rem; font-weight:500; transition:all 0.2s;
+    }
+    .btn-back:hover { background:rgba(255,255,255,0.15); color:white; }
+
+    /* ── MAIN ── */
+    .main { max-width:1100px; margin:0 auto; padding:2.5rem 1.5rem; }
+
+    .header-section { text-align:center; margin-bottom:3rem; }
+    .header-section h1 { font-size:1.8rem; font-weight:800; color:var(--text); margin-bottom:0.75rem; }
+    .header-section p { color:var(--text-muted); font-size:1rem; max-width:600px; margin:0 auto; }
+
+    /* ── FLASH MESSAGES (ALERTS) ── */
+    .alert { padding:1rem 1.25rem; border-radius:10px; margin-bottom:2rem; display:flex; align-items:center; gap:0.75rem; font-size:0.95rem; font-weight:500; }
+    .alert-success { background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.2); color:#065f46; }
+    .alert-danger { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); color:#991b1b; }
+    .alert-info { background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.2); color:#1e40af; }
+
+    /* ── GRID ── */
+    .therapist-grid {
+      display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:1.5rem;
+    }
+    .therapist-card {
+      background:var(--white); border-radius:16px; border:1px solid var(--border);
+      padding:1.5rem; transition:box-shadow 0.2s; position:relative; overflow:hidden;
+      display:flex; flex-direction:column;
+    }
+    .therapist-card:hover { box-shadow:0 8px 25px rgba(0,0,0,0.06); }
+
+    .th-info { display:flex; gap:1rem; margin-bottom:1.2rem; }
+    .th-av { width:52px; height:52px; border-radius:12px; background:var(--light); display:flex; align-items:center; justify-content:center; color:var(--teal); font-size:1.4rem; flex-shrink:0; }
+    .th-details h3 { font-size:1.15rem; font-weight:700; color:var(--text); margin-bottom:0.1rem; }
+    .th-details p { font-size:0.85rem; color:var(--teal-dark); font-weight:600; display:flex; align-items:center; gap:0.3rem; }
+
+    .th-meta { background:var(--light); border-radius:10px; padding:1rem; margin-bottom:1.5rem; }
+    .meta-row { display:flex; justify-content:space-between; margin-bottom:0.6rem; font-size:0.85rem; }
+    .meta-row:last-child { margin-bottom:0; }
+    .meta-label { color:var(--text-muted); font-weight:500; }
+    .meta-value { color:var(--text); font-weight:600; text-align:right; }
+
+    /* ── ACTION AREA ── */
+    .th-action { margin-top:auto; }
+    
+    .status-badge {
+      display:flex; align-items:center; justify-content:center; gap:0.5rem;
+      width:100%; padding:0.85rem; border-radius:10px; font-size:0.95rem; font-weight:700;
+    }
+    .status-Pending { background:rgba(245,158,11,0.1); color:#b45309; border:1px solid rgba(245,158,11,0.2); }
+    .status-Accepted { background:rgba(16,185,129,0.1); color:#047857; border:1px solid rgba(16,185,129,0.2); }
+    .status-Rejected { background:rgba(239,68,68,0.1); color:#b91c1c; border:1px solid rgba(239,68,68,0.2); }
+
+    .req-form { display:flex; flex-direction:column; gap:0.75rem; }
+    .req-input {
+      width:100%; padding:0.85rem 1rem; font-size:0.9rem; font-family:'Inter',sans-serif; color:var(--text);
+      border:1px solid var(--border); border-radius:10px; background:var(--white); outline:none; transition:0.2s;
+    }
+    .req-input:focus { border-color:var(--teal); box-shadow:0 0 0 3px rgba(10,147,150,0.15); }
+    .btn-req {
+      width:100%; padding:0.85rem; background:var(--teal); color:var(--white);
+      border:none; border-radius:10px; font-size:0.95rem; font-weight:600;
+      cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:0.4rem;
+    }
+    .btn-req:hover { background:var(--teal-dark); }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a class="nav-brand" href="{{ url_for('auth.dashboard') }}">
+      <i class="fa-solid fa-brain"></i>
+      <span>MindAIde</span>
+    </a>
+    <a href="{{ url_for('auth.dashboard') }}" class="btn-back">
+      <i class="fa-solid fa-arrow-left"></i> Dashboard
+    </a>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="header-section">
+      <h1>Therapist Recommendations</h1>
+      <p>Connect with our verified mental health professionals. Request an appointment to start your journey.</p>
+    </div>
+
+    <!-- FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          {% set alert_type = category if category in ['success', 'danger', 'info'] else 'info' %}
+          <div class="alert alert-{{ alert_type }}">
+            <i class="fa-solid fa-circle-info"></i> {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="therapist-grid">
+      {% for therapist in therapists %}
+        <div class="therapist-card">
+          
+          <div class="th-info">
+            <div class="th-av"><i class="fa-solid fa-user-doctor"></i></div>
+            <div class="th-details">
+              <h3>{{ therapist.name or 'N/A' }}</h3>
+              <p><i class="fa-solid fa-stethoscope"></i> {{ therapist.specialization or 'General' }}</p>
+            </div>
+          </div>
+
+          <div class="th-meta">
+            <div class="meta-row">
+              <span class="meta-label">Email</span>
+              <span class="meta-value">{{ therapist.email or 'N/A' }}</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Qualification</span>
+              <span class="meta-value">{{ therapist.qualification or 'N/A' }}</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Experience</span>
+              <span class="meta-value">{{ therapist.experience or '0' }} yrs</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">Contact</span>
+              <span class="meta-value">{{ therapist.contact or 'N/A' }}</span>
+            </div>
+          </div>
+
+          {% set status = appointment_map.get(therapist._id) %}
+          
+          <div class="th-action">
+            {% if status %}
+              {% if status == "Pending" %}
+                <div class="status-badge status-{{ status }}"><i class="fa-solid fa-clock"></i> Request Pending</div>
+              {% elif status == "Accepted" %}
+                <div class="status-badge status-{{ status }}"><i class="fa-solid fa-check-circle"></i> Appointment Accepted</div>
+              {% elif status == "Rejected" %}
+                <div class="status-badge status-{{ status }}"><i class="fa-solid fa-xmark-circle"></i> Appointment Declined</div>
+              {% endif %}
+            {% else %}
+              <form action="{{ url_for('therapists.request_appointment', therapist_id=therapist._id) }}" method="POST" class="req-form">
+                <input type="text" name="interest" class="req-input" placeholder="What is your concern?" required>
+                <button type="submit" class="btn-req"><i class="fa-regular fa-calendar-plus"></i> Request Appointment</button>
+              </form>
+            {% endif %}
+          </div>
+
+        </div>
+      {% endfor %}
+    </div>
+
+  </main>
+</body>
+</html>

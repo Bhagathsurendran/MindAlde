@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat with MindAIde</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --teal: #0a9396; --teal-dark: #005f73; --teal-light: #94d2bd;
+      --navy: #0d1b2a; --white: #ffffff; --light: #f3f4f6;
+      --gray: #e5e7eb; --text: #1f2937; --text-muted: #6b7280;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:var(--white); height:100vh; display:flex; overflow:hidden; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 280px; background: var(--navy); color: var(--white);
+      display: flex; flex-direction: column; padding: 1.5rem;
+      border-right: 1px solid rgba(255,255,255,0.1);
+    }
+    @media (max-width: 768px) { .sidebar { display: none; } }
+
+    .brand { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; margin-bottom: 2rem; }
+    .brand i { font-size: 1.5rem; color: var(--teal-light); }
+    .brand span { font-size: 1.35rem; font-weight: 700; color: var(--white); letter-spacing: -0.5px; }
+
+    .nav-btn {
+      display: flex; align-items: center; gap: 0.8rem;
+      padding: 0.8rem 1rem; border-radius: 8px; color: rgba(255,255,255,0.8);
+      text-decoration: none; font-size: 0.95rem; font-weight: 500;
+      transition: all 0.2s; margin-bottom: 0.5rem; border: 1px solid transparent;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.08); color: var(--white); }
+    .nav-btn.active { background: rgba(10,147,150,0.15); color: var(--teal-light); border-color: rgba(10,147,150,0.3); }
+
+    .sidebar-footer { margin-top: auto; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); }
+    .quote { font-style: italic; font-size: 0.85rem; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
+    /* ── MAIN CHAT AREA ── */
+    .chat-main { flex: 1; display: flex; flex-direction: column; background: var(--light); position: relative; }
+
+    .chat-header {
+      height: 64px; background: var(--white); border-bottom: 1px solid var(--gray);
+      display: flex; align-items: center; padding: 0 1.5rem; justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05); z-index: 10;
+    }
+    .header-info { display: flex; align-items: center; gap: 0.8rem; }
+    .ai-avatar-nav {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--teal-light); color: var(--teal-dark);
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
+    .header-info div { line-height: 1.2; }
+    .header-info h2 { font-size: 1rem; font-weight: 600; color: var(--text); }
+    .header-info span { font-size: 0.75rem; color: #10b981; font-weight: 500; display: flex; align-items: center; gap: 0.3rem; }
+    .header-info span::before { content: ''; width: 6px; height: 6px; background: #10b981; border-radius: 50%; }
+
+    /* MOBILE TOGGLE */
+    .mobile-back { display: none; color: var(--text); font-size: 1.2rem; text-decoration: none; margin-right: 1rem; }
+    @media (max-width: 768px) { .mobile-back { display: block; } }
+
+    /* ── CHAT LOG ── */
+    .chat-log {
+      flex: 1; overflow-y: auto; padding: 2rem 1.5rem;
+      display: flex; flex-direction: column; gap: 1.5rem; scroll-behavior: smooth;
+    }
+    
+    .message-wrapper { display: flex; gap: 1rem; max-width: 85%; }
+    .message-wrapper.bot { align-self: flex-start; }
+    .message-wrapper.user { align-self: flex-end; flex-direction: row-reverse; }
+
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .avatar.bot-av { background: var(--teal); color: var(--white); }
+    .avatar.user-av { background: var(--navy); color: var(--white); }
+
+    .message {
+      padding: 1rem 1.25rem; border-radius: 12px; font-size: 0.95rem; line-height: 1.5;
+      position: relative; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .bot .message { background: var(--white); color: var(--text); border: 1px solid var(--gray); border-top-left-radius: 4px; }
+    .user .message { background: var(--teal); color: var(--white); border-top-right-radius: 4px; }
+
+    /* ── INPUT AREA ── */
+    .input-area {
+      padding: 1.5rem; background: var(--white); border-top: 1px solid var(--gray);
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .input-wrapper {
+      flex: 1; position: relative; display: flex; align-items: center;
+      background: var(--light); border: 1.5px solid var(--gray); border-radius: 24px;
+      transition: border-color 0.2s; padding: 0.5rem 1rem;
+    }
+    .input-wrapper:focus-within { border-color: var(--teal); background: var(--white); }
+    .input-field {
+      flex: 1; border: none; background: transparent; outline: none;
+      font-size: 0.95rem; font-family: 'Inter', sans-serif; color: var(--text);
+      padding: 0.5rem 0; resize: none; overflow: hidden; height: 24px; line-height: 24px;
+    }
+    .btn-send {
+      width: 44px; height: 44px; border-radius: 50%; background: var(--teal);
+      color: var(--white); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; transition: all 0.2s; flex-shrink: 0;
+    }
+    .btn-send:hover { background: var(--teal-dark); transform: scale(1.05); }
+    .btn-send:disabled { background: var(--gray); cursor: not-allowed; transform: none; }
+
+    /* ── TYPING INDICATOR ── */
+    .typing { display: flex; gap: 0.4rem; padding: 1.2rem; background: var(--white); border: 1px solid var(--gray); border-radius: 12px; border-top-left-radius: 4px; width: fit-content; }
+    .dot { width: 8px; height: 8px; background: var(--teal-light); border-radius: 50%; animation: blink 1.4s infinite both; }
+    .dot:nth-child(1) { animation-delay: 0s; }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink { 0%, 80%, 100% { opacity: 0; transform: scale(0.8); } 40% { opacity: 1; transform: scale(1); } }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <a href="{{ url_for('auth.dashboard') }}" class="brand">
+      <i class="fa-solid fa-brain"></i>
+      <span>MindAIde</span>
+    </a>
+    
+    <a href="{{ url_for('auth.dashboard') }}" class="nav-btn">
+      <i class="fa-solid fa-table-columns"></i> Dashboard
+    </a>
+    <a href="{{ url_for('chatbot.chatbot_page') }}" class="nav-btn active">
+      <i class="fa-solid fa-robot"></i> AI Chat
+    </a>
+    <a href="{{ url_for('quiz.quiz_page') }}" class="nav-btn">
+      <i class="fa-solid fa-clipboard-question"></i> Mental Quiz
+    </a>
+    <a href="{{ url_for('selfcare.selfcare_home') }}" class="nav-btn">
+      <i class="fa-solid fa-heart-pulse"></i> Self-Care
+    </a>
+
+    <div class="sidebar-footer">
+      <p class="quote">"It's okay to ask for help. We're here to listen, 24/7."</p>
+    </div>
+  </aside>
+
+  <!-- MAIN CHAT -->
+  <main class="chat-main">
+    <header class="chat-header">
+      <div style="display:flex; align-items:center;">
+        <a href="{{ url_for('auth.dashboard') }}" class="mobile-back"><i class="fa-solid fa-arrow-left"></i></a>
+        <div class="header-info">
+          <div class="ai-avatar-nav"><i class="fa-solid fa-robot"></i></div>
+          <div>
+            <h2>MindAIde Assistant</h2>
+            <span>Online</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="chat-log" id="chat-log">
+      <!-- Welcome Message -->
+      <div class="message-wrapper bot">
+        <div class="avatar bot-av"><i class="fa-solid fa-robot"></i></div>
+        <div class="message">Hi there. I'm your MindAIde assistant. How are you feeling today? 💙</div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-wrapper">
+        <input type="text" id="user-input" class="input-field" placeholder="Message MindAIde..." autocomplete="off"/>
+      </div>
+      <button class="btn-send" id="send-btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+  </main>
+
+  <script>
+    const chatLog = document.getElementById("chat-log");
+    const inputField = document.getElementById("user-input");
+    const sendBtn = document.getElementById("send-btn");
+
+    // Allow Enter key to send
+    inputField.addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    function createMessageWrapper(isUser) {
+      const wrapper = document.createElement("div");
+      wrapper.className = `message-wrapper ${isUser ? 'user' : 'bot'}`;
+      
+      const avatar = document.createElement("div");
+      avatar.className = `avatar ${isUser ? 'user-av' : 'bot-av'}`;
+      avatar.innerHTML = isUser ? '<i class="fa-solid fa-user"></i>' : '<i class="fa-solid fa-robot"></i>';
+      
+      wrapper.appendChild(avatar);
+      return wrapper;
+    }
+
+    function appendMessage(text, isUser) {
+      const wrapper = createMessageWrapper(isUser);
+      const msgDiv = document.createElement("div");
+      msgDiv.className = "message";
+      msgDiv.innerText = text; // innerText properly escapes HTML
+      
+      wrapper.appendChild(msgDiv);
+      chatLog.appendChild(wrapper);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    function appendTypingIndicator() {
+      const wrapper = createMessageWrapper(false);
+      wrapper.id = "typing-indicator";
+      
+      const typingDiv = document.createElement("div");
+      typingDiv.className = "typing";
+      typingDiv.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+      
+      wrapper.appendChild(typingDiv);
+      chatLog.appendChild(wrapper);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+      const indicator = document.getElementById("typing-indicator");
+      if (indicator) indicator.remove();
+    }
+
+    function sendMessage() {
+      const text = inputField.value.trim();
+      if (!text) return;
+
+      appendMessage(text, true);
+      inputField.value = "";
+      inputField.disabled = true;
+      sendBtn.disabled = true;
+      appendTypingIndicator();
+
+      fetch("{{ url_for('chatbot.chatbot_page') }}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text }) // session_id removed as it wasn't used backend
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Network response was not ok");
+        return res.json();
+      })
+      .then(data => {
+        removeTypingIndicator();
+        appendMessage(data.response, false);
+      })
+      .catch(err => {
+        removeTypingIndicator();
+        appendMessage("I'm sorry, I'm having trouble connecting to the server. Please try again later.", false);
+      })
+      .finally(() => {
+        inputField.disabled = false;
+        sendBtn.disabled = false;
+        inputField.focus();
+      });
+    }
+  </script>
+</body>
+</html>

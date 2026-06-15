@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindAIde - Self-Care Suggestions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        :root {
+            --teal: #0a9396; --teal-dark: #005f73; --teal-light: #94d2bd;
+            --navy: #0d1b2a; --white: #ffffff; --light: #f0f4f8; --light2: #e8f4f5;
+            --text: #1f2937; --text-muted: #6b7280; --border: #e5e7eb;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:var(--light); min-height:100vh; }
+
+        /* ── NAVBAR ── */
+        .navbar {
+            background:var(--navy); padding:0 2rem;
+            display:flex; align-items:center; justify-content:space-between;
+            height:64px; position:sticky; top:0; z-index:100;
+            box-shadow:0 2px 12px rgba(0,0,0,0.25);
+        }
+        .nav-brand { display:flex; align-items:center; gap:0.6rem; text-decoration:none; }
+        .nav-brand i { font-size:1.3rem; color:var(--teal-light); }
+        .nav-brand span { font-size:1.2rem; font-weight:800; color:var(--white); }
+        .nav-links { display:flex; gap:1.5rem; align-items:center; }
+        .nav-links a { color:rgba(255,255,255,0.75); text-decoration:none; font-size:0.9rem; font-weight:500; transition:color 0.2s;}
+        .nav-links a:hover { color:var(--white); }
+        .btn-logout {
+            display:flex; align-items:center; gap:0.4rem;
+            background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
+            color:rgba(255,255,255,0.8); padding:0.45rem 1rem; border-radius:8px;
+            text-decoration:none; font-size:0.85rem; font-weight:500; transition:all 0.2s;
+        }
+        .btn-logout:hover { background:rgba(239,68,68,0.2); border-color:rgba(239,68,68,0.3); color:white; }
+
+        /* ── MAIN LAYOUT ── */
+        .main { max-width:1200px; margin:0 auto; padding:2.5rem 1.5rem; display:grid; grid-template-columns:250px 1fr; gap:2rem; }
+
+        /* ── SIDEBAR MENU ── */
+        .menu-sidebar {
+            background:var(--white); border-radius:16px; padding:1.5rem;
+            box-shadow:0 4px 15px rgba(0,0,0,0.03); border:1px solid var(--border);
+            display:flex; flex-direction:column; gap:8px; height:fit-content; position:sticky; top:100px;
+        }
+        .menu-sidebar h2 { font-size:1.15rem; color:var(--text); margin-bottom:1rem; padding-bottom:0.75rem; border-bottom:1px solid var(--border); }
+        .menu-btn {
+            background:transparent; border:none; color:var(--text);
+            font-size:0.95rem; font-weight:500; text-align:left;
+            padding:10px 14px; border-radius:10px; cursor:pointer;
+            transition:all 0.2s; display:flex; align-items:center; gap:10px;
+        }
+        .menu-btn i { font-size:1.1rem; color:var(--text-muted); width:20px; text-align:center; transition:color 0.2s; }
+        .menu-btn:hover { background:var(--light2); }
+        .menu-btn.active { background:var(--teal); color:var(--white); }
+        .menu-btn.active i { color:var(--white); }
+
+        /* ── CONTENT AREA ── */
+        .main-content {
+            background:var(--white); border-radius:16px; padding:2rem;
+            box-shadow:0 4px 15px rgba(0,0,0,0.03); border:1px solid var(--border);
+            min-height:500px;
+        }
+        .content-section { display:none; animation:fadeIn 0.3s ease-in-out; }
+        .content-section.active { display:block; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        
+        .section-title { font-size:1.4rem; font-weight:700; color:var(--text); margin-bottom:1.5rem; display:flex; align-items:center; gap:10px; padding-bottom:1rem; border-bottom:1px solid var(--border); }
+        .section-title i { color:var(--teal); }
+        .category-header { font-size:1.1rem; color:var(--text); margin:1.5rem 0 1rem; display:flex; align-items:center; gap:8px; font-weight:600; }
+        .category-header i { color:var(--teal-dark); }
+
+        /* ── CARDS ── */
+        .item-list { display:flex; flex-direction:column; gap:12px; list-style:none; }
+        .card-item {
+            background:var(--white); border:1.5px solid var(--border); border-radius:12px;
+            padding:1.2rem 1.5rem; display:flex; justify-content:space-between; align-items:center;
+            transition:all 0.2s;
+        }
+        .card-item:hover { transform:translateY(-2px); box-shadow:0 8px 16px rgba(0,0,0,0.04); border-color:#cbd5e0; }
+        .card-content { display:flex; flex-direction:column; gap:5px; flex-grow:1; }
+        .card-content h3 { font-size:1rem; color:var(--text); font-weight:600; display:flex; align-items:center; gap:8px; margin:0; }
+        .card-content p { color:var(--text-muted); font-size:0.9rem; margin:0; line-height:1.5; }
+        .card-content i { color:var(--teal); }
+
+        /* ── BUTTONS ── */
+        .card-actions { display:flex; gap:8px; align-items:center; position:relative; }
+        .action-btn {
+            border:none; padding:8px 14px; border-radius:8px; font-size:0.85rem; font-weight:600;
+            cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; gap:6px;
+        }
+        .btn-save { background:var(--teal-light); color:var(--navy); }
+        .btn-save:hover { background:var(--teal); color:white; }
+        .btn-reminder { background:#ecc94b; color:#744210; }
+        .btn-reminder:hover { background:#d6b645; }
+        .btn-delete { background:#fca5a5; color:#7f1d1d; }
+        .btn-delete:hover { background:#ef4444; color:white; }
+        .btn-done { background:#a7f3d0; color:#065f46; transition:all 0.2s; }
+        .btn-done:hover { background:#10b981; color:white;}
+        
+        .btn-link {
+            background:var(--light); color:var(--text); text-decoration:none;
+            padding:8px 14px; border-radius:8px; font-weight:600; font-size:0.85rem;
+            display:inline-flex; align-items:center; gap:6px; transition:all 0.2s; border:1px solid var(--border);
+        }
+        .btn-link:hover { background:white; border-color:var(--text-muted); }
+
+        .status-msg {
+            font-size:0.85rem; font-weight:600; color:var(--teal);
+            position:absolute; right:110%; white-space:nowrap;
+            opacity:0; transition:opacity 0.3s;
+        }
+
+        /* ── REMINDER POPUP ── */
+        .reminder-popup {
+            position:absolute; background:var(--white); padding:1rem; border-radius:12px;
+            box-shadow:0 10px 25px rgba(0,0,0,0.1); border:1px solid var(--border);
+            display:flex; flex-direction:column; gap:12px; z-index:100;
+            top:110%; right:0; min-width:260px;
+        }
+        .reminder-popup label { font-size:0.85rem; color:var(--text); font-weight:600; display:flex; align-items:center; gap:6px; }
+        .reminder-popup input { padding:10px; border:1px solid var(--border); border-radius:8px; font-family:'Inter'; outline:none; transition:border 0.2s; }
+        .reminder-popup input:focus { border-color:var(--teal); }
+        .popup-actions { display:flex; gap:8px; }
+        
+        /* Utility */
+        .empty-state { text-align:center; color:var(--text-muted); padding:3rem 1rem; display:flex; flex-direction:column; align-items:center; gap:1rem; }
+        .empty-state i { font-size:3rem; color:var(--border); }
+        .empty-state p { font-size:1rem; font-weight:500; }
+        .completed-task { opacity:0.5; }
+        .completed-task h3 { text-decoration:line-through; }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a class="nav-brand" href="{{ url_for('auth.dashboard') }}">
+            <i class="fa-solid fa-brain"></i>
+            <span>MindAIde</span>
+        </a>
+        <div class="nav-links">
+            <a href="{{ url_for('auth.dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('auth.logout') }}" class="btn-logout">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </a>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTAINTER -->
+    <main class="main">
+        
+        <!-- SIDEBAR -->
+        <aside class="menu-sidebar">
+            <h2>Self-Care Space</h2>
+            <button class="menu-btn active" onclick="showSection('resources', this)">
+                <i class="fa-solid fa-book-open"></i> Resources
+            </button>
+            <button class="menu-btn" onclick="showSection('todo', this)">
+                <i class="fa-solid fa-list-check"></i> To-Do List
+            </button>
+            <button class="menu-btn" onclick="showSection('notifications', this)">
+                <i class="fa-solid fa-bell"></i> Reminders
+            </button>
+        </aside>
+
+        <!-- CONTENT AREA -->
+        <div class="main-content">
+            
+            <!-- Resources Section -->
+            <div class="content-section active" id="resources">
+                <h2 class="section-title">
+                    <i class="fa-solid fa-lightbulb"></i> 
+                    Recommended for:<span id="categoryName" style="margin-left:8px; color: var(--teal-dark);">...</span>
+                </h2>
+                <div id="resourceList">
+                    <div class="empty-state">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        <p>Loading curated resources...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- To-Do Section -->
+            <div class="content-section" id="todo">
+                <h2 class="section-title"><i class="fa-solid fa-clipboard-check"></i> Your To-Do List</h2>
+                <ul class="item-list" id="todoList">
+                    <!-- Loaded dynamically -->
+                </ul>
+            </div>
+            
+            <!-- Notifications Section -->
+            <div class="content-section" id="notifications">
+                <h2 class="section-title"><i class="fa-solid fa-clock"></i> Upcoming Reminders</h2>
+                <ul class="item-list" id="notificationList">
+                    <!-- Loaded dynamically -->
+                </ul>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        function showSection(sectionId, btnElement) {
+            document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            btnElement.classList.add('active');
+
+            if (sectionId === 'notifications') loadNotifications();
+            else if (sectionId === 'todo') loadTodos();
+        }
+
+        // --- FLASH MESSAGING HELPER ---
+        function showFlashMessage(btnElement, message) {
+            let existingMsg = btnElement.parentElement.querySelector('.status-msg');
+            if (existingMsg) existingMsg.remove();
+            let flashMsg = document.createElement("span");
+            flashMsg.classList.add("status-msg");
+            flashMsg.innerHTML = `<i class="fa-solid fa-check"></i> ${message}`;
+            btnElement.parentElement.appendChild(flashMsg);
+            setTimeout(() => { flashMsg.style.opacity = "1"; }, 10);
+            setTimeout(() => { flashMsg.style.opacity = "0"; setTimeout(() => flashMsg.remove(), 300); }, 1500);
+        }
+
+        // --- TODO LOGIC ---
+        function saveToDo(itemText, btnElement) {
+            fetch("{{ url_for('selfcare.add_todo') }}", {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: itemText })
+            }).then(() => { showFlashMessage(btnElement, "Saved to tasks!"); });
+        }
+
+        function deleteToDo(itemText, btnElement) {
+            fetch("{{ url_for('selfcare.delete_todo') }}", {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: itemText })
+            }).then(() => {
+                btnElement.closest(".card-item").remove();
+                if(document.getElementById("todoList").children.length === 0) {
+                     document.getElementById("todoList").innerHTML = '<div class="empty-state"><i class="fa-solid fa-clipboard-list" style="opacity:0.5;"></i><p>Your task list is completely clear!</p></div>';
+                }
+            });
+        }
+
+        function loadTodos() {
+            fetch("{{ url_for('selfcare.get_todos') }}").then(response => response.json()).then(todos => {
+                const list = document.getElementById("todoList");
+                list.innerHTML = "";
+                if(todos.length === 0) {
+                    list.innerHTML = '<div class="empty-state"><i class="fa-solid fa-clipboard-list" style="opacity:0.5;"></i><p>No tasks saved yet. Add some from the resources tab!</p></div>';
+                    return;
+                }
+                todos.forEach(todo => {
+                    const li = document.createElement("li");
+                    li.className = "card-item";
+                    li.innerHTML = `
+                        <div class="card-content">
+                            <h3><i class="fa-regular fa-circle-check"></i> ${todo.text}</h3>
+                        </div>
+                        <div class="card-actions">
+                            <button class="action-btn btn-reminder" onclick="openReminderPopup('${todo.text.replace(/'/g, "\\'")}', this)">
+                                <i class="fa-solid fa-bell"></i> Remind
+                            </button>
+                            <button class="action-btn btn-delete" onclick="deleteToDo('${todo.text.replace(/'/g, "\\'")}', this)">
+                                <i class="fa-solid fa-trash-can"></i> Drop
+                            </button>
+                        </div>
+                    `;
+                    list.appendChild(li);
+                });
+            });
+        }
+
+        // --- REMINDER LOGIC ---
+        function openReminderPopup(itemText, btnElement) {
+            document.querySelectorAll('.reminder-popup').forEach(el => el.remove());
+            const popup = document.createElement("div");
+            popup.className = "reminder-popup";
+            popup.innerHTML = `
+                <label><i class="fa-solid fa-clock"></i> Notify me at:</label>
+                <input type="datetime-local" id="reminderTime">
+                <div class="popup-actions">
+                    <button class="action-btn btn-save" onclick="saveReminder('${itemText}', this)" style="flex:1; justify-content:center; background:var(--teal); color:white;">Set</button>
+                    <button class="action-btn" onclick="this.closest('.reminder-popup').remove()" style="background:var(--light); color:var(--text-muted); flex:1; justify-content:center; border:1px solid var(--border);">Cancel</button>
+                </div>
+            `;
+            btnElement.parentElement.appendChild(popup);
+            setTimeout(() => { popup.querySelector('input').focus(); }, 50);
+        }
+
+        function saveReminder(itemText, popupBtnElement) {
+            const popupData = popupBtnElement.closest('.reminder-popup');
+            const reminderTime = popupData.querySelector('input').value;
+            if(!reminderTime) { alert("Please select a date and time!"); return; }
+            fetch("{{ url_for('selfcare.add_notification') }}", {
+                method: "POST", headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: itemText, time: reminderTime })
+            }).then(res => res.json()).then(data => {
+                if (data.success) {
+                    showFlashMessage(popupData.parentElement.querySelector('.btn-reminder'), "Reminder Active");
+                    popupData.remove();
+                }
+            });
+        }
+        
+        // --- NOTIFICATIONS LOGIC ---
+        function loadNotifications() {
+            fetch("{{ url_for('selfcare.get_notifications') }}").then(response => response.json()).then(data => {
+                const list = document.getElementById("notificationList");
+                list.innerHTML = ""; 
+                if (data.notifications && data.notifications.length > 0) {
+                    data.notifications.forEach(notif => {
+                        const li = document.createElement("li");
+                        li.className = "card-item";
+                        const isDone = (notif.status === "done");
+                        if(isDone) li.classList.add("completed-task");
+                        li.innerHTML = `
+                            <div class="card-content">
+                                <h3><i class="fa-solid fa-calendar-check"></i> ${notif.text}</h3>
+                                <p><i class="fa-regular fa-clock" style="color:var(--text-muted);"></i> Scheduled for: ${notif.time.replace('T', ' ')}</p>
+                            </div>
+                            <div class="card-actions">
+                                ${!isDone ? `<button class="action-btn btn-done" onclick="markAsDone('${notif._id || notif.notification_id}', this)"><i class="fa-solid fa-check-double"></i> Done</button>` : ''}
+                                <button class="action-btn btn-delete" onclick="deleteNotification('${notif._id || notif.notification_id}', this)"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                        `;
+                        list.appendChild(li);
+                    });
+                } else {
+                    list.innerHTML = '<div class="empty-state"><i class="fa-regular fa-bell-slash" style="opacity:0.5;"></i><p>No active reminders right now.</p></div>';
+                }
+            });
+        }
+
+        function markAsDone(notifId, btnElement) {
+            if(!notifId || notifId === "undefined") return alert("Error processing ID.");
+            fetch("{{ url_for('selfcare.mark_notification_done', notif_id='') }}" + notifId, { method: "POST" }).then(response => response.json()).then(data => {
+                if (data.success) {
+                    const card = btnElement.closest(".card-item");
+                    card.classList.add("completed-task");
+                    btnElement.remove();
+                }
+            });
+        }
+
+        function deleteNotification(notifId, btnElement) {
+            if(!notifId || notifId === "undefined") return alert("Error processing ID.");
+            fetch("{{ url_for('selfcare.delete_notification', notif_id='') }}" + notifId, { method: "POST" }).then(response => response.json()).then(data => {
+                if (data.success) {
+                    btnElement.closest(".card-item").remove();
+                    if(document.getElementById("notificationList").children.length === 0) {
+                        document.getElementById("notificationList").innerHTML = '<div class="empty-state"><i class="fa-regular fa-bell-slash" style="opacity:0.5;"></i><p>No active reminders right now.</p></div>';
+                    }
+                }
+            });
+        }
+
+        // --- RESOURCE LOADING SYSTEM ---
+        async function loadResources() {
+            const params = new URLSearchParams(window.location.search);
+            const category = params.get("category");
+            if (!category) {
+                document.getElementById("resourceList").innerHTML = '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><p>No category specified in URL!</p></div>';
+                return;
+            }
+            document.getElementById("categoryName").textContent = category;
+            try {
+                const response = await fetch("{{ url_for('selfcare.get_resources') }}?category=" + encodeURIComponent(category));
+                const data = await response.json();
+                let htmlContent = "";
+                if (data.resources) {
+                    if (data.resources.activities && data.resources.activities.length) {
+                        htmlContent += '<h3 class="category-header"><i class="fa-solid fa-person-running"></i> Grounding Activities</h3><div class="item-list">';
+                        data.resources.activities.forEach(activity => {
+                            htmlContent += `
+                            <div class="card-item">
+                                <div class="card-content"><p>${activity}</p></div>
+                                <div class="card-actions">
+                                    <button class="action-btn btn-save" onclick="saveToDo('${activity.replace(/'/g, "\\'")}', this)"><i class="fa-solid fa-plus"></i> Save</button>
+                                </div>
+                            </div>`;
+                        }); htmlContent += '</div>';
+                    }
+                    if (data.resources.exercises && data.resources.exercises.length) {
+                        htmlContent += '<h3 class="category-header"><i class="fa-solid fa-dumbbell"></i> Physical Exercises</h3><div class="item-list">';
+                        data.resources.exercises.forEach(exercise => {
+                            htmlContent += `
+                            <div class="card-item">
+                                <div class="card-content"><p>${exercise}</p></div>
+                                <div class="card-actions">
+                                    <button class="action-btn btn-save" onclick="saveToDo('${exercise.replace(/'/g, "\\'")}', this)"><i class="fa-solid fa-plus"></i> Save</button>
+                                </div>
+                            </div>`;
+                        }); htmlContent += '</div>';
+                    }
+                    if (data.resources.youtube_videos && data.resources.youtube_videos.length) {
+                        htmlContent += '<h3 class="category-header"><i class="fa-brands fa-youtube" style="color:#ef4444;"></i> Recommended Videos</h3><div class="item-list">';
+                        data.resources.youtube_videos.forEach(video => {
+                            htmlContent += `
+                            <div class="card-item">
+                                <div class="card-content"><h3>${video.title}</h3></div>
+                                <div class="card-actions">
+                                    <a href="${video.url}" target="_blank" class="btn-link"><i class="fa-solid fa-play"></i> Watch</a>
+                                    <button class="action-btn btn-save" onclick="saveToDo('Watch: ${video.title.replace(/'/g, "\\'")}', this)"><i class="fa-solid fa-plus"></i> Save</button>
+                                </div>
+                            </div>`;
+                        }); htmlContent += '</div>';
+                    }
+                    if (data.resources.articles && data.resources.articles.length) {
+                        htmlContent += '<h3 class="category-header"><i class="fa-solid fa-newspaper"></i> Helpful Articles</h3><div class="item-list">';
+                        data.resources.articles.forEach(article => {
+                            htmlContent += `
+                            <div class="card-item">
+                                <div class="card-content"><h3>${article.title}</h3></div>
+                                <div class="card-actions">
+                                    <a href="${article.url}" target="_blank" class="btn-link"><i class="fa-solid fa-book-open"></i> Read</a>
+                                    <button class="action-btn btn-save" onclick="saveToDo('Read: ${article.title.replace(/'/g, "\\'")}', this)"><i class="fa-solid fa-plus"></i> Save</button>
+                                </div>
+                            </div>`;
+                        }); htmlContent += '</div>';
+                    }
+                    if (data.resources.books && data.resources.books.length) {
+                        htmlContent += '<h3 class="category-header"><i class="fa-solid fa-book"></i> Reading Material</h3><div class="item-list">';
+                        data.resources.books.forEach(book => {
+                            htmlContent += `
+                            <div class="card-item">
+                                <div class="card-content"><h3>${book.title}</h3></div>
+                                <div class="card-actions">
+                                    <a href="${book.url}" target="_blank" class="btn-link"><i class="fa-solid fa-link"></i> View</a>
+                                    <button class="action-btn btn-save" onclick="saveToDo('Read book: ${book.title.replace(/'/g, "\\'")}', this)"><i class="fa-solid fa-plus"></i> Save</button>
+                                </div>
+                            </div>`;
+                        }); htmlContent += '</div>';
+                    }
+                } else {
+                    htmlContent = '<div class="empty-state"><i class="fa-regular fa-compass" style="opacity:0.5;"></i><p>No specific resources found for this category.</p></div>';
+                }
+                document.getElementById("resourceList").innerHTML = htmlContent;
+                
+            } catch (error) {
+                console.error("Error loading resources:", error);
+                document.getElementById("resourceList").innerHTML = '<div class="empty-state"><i class="fa-solid fa-plug-circle-xmark" style="opacity:0.5;"></i><p>Failed to load resources from server.</p></div>';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener("DOMContentLoaded", function() {
+            loadResources();
+            loadTodos();
+        });
+    </script>
+</body>
+</html>

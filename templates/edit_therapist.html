@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Therapist - MindAIde</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --teal: #0a9396; --teal-dark: #005f73; --teal-light: #94d2bd;
+      --navy: #0d1b2a; --white: #ffffff; --light: #f3f4f6;
+      --text: #1f2937; --text-muted: #6b7280; --border: #e5e7eb;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:var(--light); min-height:100vh; display:flex; flex-direction:column; }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      background:var(--navy); padding:0 2rem;
+      display:flex; align-items:center; justify-content:space-between;
+      height:64px; position:sticky; top:0; z-index:100;
+      box-shadow:0 2px 12px rgba(0,0,0,0.25);
+    }
+    .nav-brand { display:flex; align-items:center; gap:0.6rem; text-decoration:none; }
+    .nav-brand i { font-size:1.3rem; color:var(--teal-light); }
+    .nav-brand span { font-size:1.2rem; font-weight:800; color:var(--white); }
+    .btn-back {
+      display:flex; align-items:center; gap:0.4rem;
+      background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
+      color:rgba(255,255,255,0.8); padding:0.45rem 1rem; border-radius:8px;
+      text-decoration:none; font-size:0.85rem; font-weight:500; transition:all 0.2s;
+    }
+    .btn-back:hover { background:rgba(255,255,255,0.15); color:white; }
+
+    /* ── MAIN ── */
+    .main { flex:1; display:flex; align-items:center; justify-content:center; padding:3rem 1.5rem; }
+
+    .edit-card {
+      background:var(--white); border-radius:20px; padding:3rem; width:100%; max-width:600px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.05); border:1px solid var(--border);
+    }
+
+    .edit-header { text-align:center; margin-bottom:2.5rem; }
+    .edit-icon {
+      width:60px; height:60px; border-radius:14px; background:rgba(10,147,150,0.1); color:var(--teal);
+      display:flex; align-items:center; justify-content:center; font-size:1.8rem; margin:0 auto 1.5rem;
+    }
+    .edit-header h2 { font-size:1.6rem; font-weight:800; color:var(--text); margin-bottom:0.4rem; letter-spacing:-0.5px; }
+
+    /* ── FORM ── */
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
+    .form-group-full { grid-column:1 / -1; }
+    
+    .form-label { display:block; font-size:0.9rem; font-weight:600; color:var(--text); margin-bottom:0.5rem; }
+    
+    .input-wrapper { position:relative; }
+    .input-wrapper i { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:0.9rem; }
+    
+    .form-input {
+      width:100%; padding:0.85rem 1rem 0.85rem 2.6rem;
+      border:1.5px solid var(--border); border-radius:10px;
+      font-size:0.95rem; font-family:'Inter',sans-serif;
+      color:var(--text); background:var(--light);
+      transition:all 0.2s; outline:none;
+    }
+    .form-input:focus { border-color:var(--teal); background:var(--white); box-shadow:0 0 0 3px rgba(10,147,150,0.1); }
+
+    .btn-submit {
+      width:100%; padding:0.9rem; background:var(--teal); color:var(--white);
+      border:none; border-radius:10px; font-size:1rem; font-weight:700;
+      cursor:pointer; transition:all 0.3s; font-family:'Inter',sans-serif;
+      display:flex; align-items:center; justify-content:center; gap:0.5rem; margin-top:1.5rem;
+    }
+    .btn-submit:hover { background:var(--teal-dark); transform:translateY(-2px); box-shadow:0 6px 15px rgba(10,147,150,0.25); }
+    
+    @media (max-width:600px) { .form-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a class="nav-brand" href="{{ url_for('auth.admin_dashboard') }}">
+      <i class="fa-solid fa-brain"></i>
+      <span>MindAIde</span>
+    </a>
+    <a href="{{ url_for('therapists.manage_therapists') }}" class="btn-back">
+      <i class="fa-solid fa-arrow-left"></i> Back to Therapists
+    </a>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="edit-card">
+      <div class="edit-header">
+        <div class="edit-icon"><i class="fa-solid fa-user-doctor"></i></div>
+        <h2>Edit Therapist Profile</h2>
+      </div>
+
+      <form action="{{ url_for('therapists.edit_therapist', therapist_id=therapist['_id']) }}" method="POST">
+        
+        <div class="form-grid">
+          <div class="form-group-full">
+            <label class="form-label" for="name">Full Name</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-user"></i>
+              <input type="text" id="name" name="name" class="form-input" value="{{ therapist['name'] }}" required>
+            </div>
+          </div>
+          
+          <div class="form-group-full">
+            <label class="form-label" for="email">Email Address</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-envelope"></i>
+              <input type="email" id="email" name="email" class="form-input" value="{{ therapist['email'] }}" required>
+            </div>
+          </div>
+          
+          <div>
+            <label class="form-label" for="specialization">Specialization</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-stethoscope"></i>
+              <input type="text" id="specialization" name="specialization" class="form-input" value="{{ therapist.get('specialization', '') }}" required>
+            </div>
+          </div>
+          
+          <div>
+            <label class="form-label" for="qualification">Qualification</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-graduation-cap"></i>
+              <input type="text" id="qualification" name="qualification" class="form-input" value="{{ therapist.get('qualification', '') }}" required>
+            </div>
+          </div>
+          
+          <div>
+            <label class="form-label" for="experience">Experience (Years)</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-briefcase"></i>
+              <input type="text" id="experience" name="experience" class="form-input" value="{{ therapist.get('experience', '') }}" required>
+            </div>
+          </div>
+          
+          <div>
+            <label class="form-label" for="contact">Contact Number</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-phone"></i>
+              <input type="text" id="contact" name="contact" class="form-input" value="{{ therapist.get('contact', '') }}" required>
+            </div>
+          </div>
+        </div>
+        
+        <button type="submit" class="btn-submit"><i class="fa-solid fa-floppy-disk"></i> Update Therapist</button>
+      </form>
+    </div>
+  </main>
+
+</body>
+</html>

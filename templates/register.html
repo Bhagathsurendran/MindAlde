@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - MindAIde</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <script defer src="/static/js/register.js"></script>
+  <style>
+    :root {
+      --teal: #0a9396; --teal-dark: #005f73; --teal-light: #94d2bd;
+      --navy: #0d1b2a; --white: #ffffff; --light: #f0f4f8;
+      --text: #1f2937; --text-muted: #6b7280;
+      --input-border: #d1d5db; --error: #ef4444; --success: #10b981;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; overflow-x: hidden; }
+
+    /* LEFT PANEL */
+    .left-panel {
+      flex: 1; background: linear-gradient(135deg, var(--navy) 0%, #1a3a4f 60%, #0a4a5f 100%);
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      padding: 3rem; text-align: center; position: relative; overflow: hidden;
+    }
+    .left-panel::before { content:''; position:absolute; width:350px; height:350px; border-radius:50%; background:rgba(10,147,150,0.12); top:-80px; left:-80px; }
+    .left-panel::after { content:''; position:absolute; width:250px; height:250px; border-radius:50%; background:rgba(10,147,150,0.08); bottom:-60px; right:-50px; }
+    .brand { position:relative; z-index:1; }
+    .brand-logo { display:flex; align-items:center; gap:0.7rem; justify-content:center; margin-bottom:2.5rem; }
+    .brand-logo i { font-size:2rem; color:var(--teal-light); }
+    .brand-logo span { font-size:1.8rem; font-weight:800; color:var(--white); letter-spacing:-1px; }
+    .brand h2 { font-size:1.5rem; font-weight:700; color:var(--white); margin-bottom:1rem; line-height:1.3; }
+    .brand p { color:rgba(255,255,255,0.6); font-size:0.92rem; line-height:1.7; max-width:300px; margin:0 auto 2rem; }
+    .role-cards { display:flex; flex-direction:column; gap:0.75rem; max-width:260px; margin:0 auto; }
+    .role-card { display:flex; align-items:center; gap:0.75rem; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:0.8rem 1rem; text-align:left; }
+    .role-card i { color:var(--teal-light); font-size:1.1rem; width:20px; flex-shrink:0; }
+    .role-card div { }
+    .role-card strong { display:block; color:var(--white); font-size:0.9rem; }
+    .role-card small { color:rgba(255,255,255,0.5); font-size:0.78rem; }
+    @media (max-width:768px) { .left-panel { display:none; } }
+
+    /* RIGHT PANEL */
+    .right-panel {
+      width:500px; background:var(--white);
+      display:flex; flex-direction:column; justify-content:flex-start;
+      padding:2.5rem 3rem; overflow-y:auto; max-height:100vh;
+    }
+    @media (max-width:768px) { .right-panel { width:100%; padding:1.5rem; } }
+
+    .back-home { display:inline-flex; align-items:center; gap:0.4rem; color:var(--text-muted); font-size:0.85rem; text-decoration:none; margin-bottom:1.5rem; transition:color 0.2s; }
+    .back-home:hover { color:var(--teal); }
+
+    .reg-header { margin-bottom:1.75rem; }
+    .reg-header h1 { font-size:1.7rem; font-weight:800; color:var(--text); letter-spacing:-0.5px; margin-bottom:0.3rem; }
+    .reg-header p { color:var(--text-muted); font-size:0.9rem; }
+
+    /* FORM */
+    .form-group { margin-bottom:1.1rem; }
+    .form-label { display:block; font-size:0.82rem; font-weight:600; color:var(--text); margin-bottom:0.4rem; }
+    .input-wrapper { position:relative; }
+    .input-wrapper i.icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:0.85rem; }
+    .form-input, .form-select {
+      width:100%; padding:0.7rem 1rem 0.7rem 2.5rem;
+      border:1.5px solid var(--input-border); border-radius:10px;
+      font-size:0.92rem; font-family:'Inter',sans-serif;
+      color:var(--text); background:var(--light); transition:all 0.2s; outline:none;
+    }
+    .form-select { appearance:none; cursor:pointer; }
+    .form-input:focus, .form-select:focus { border-color:var(--teal); background:var(--white); box-shadow:0 0 0 3px rgba(10,147,150,0.1); }
+
+    /* DYNAMIC FIELDS */
+    #dynamic-fields { margin-top:0.25rem; }
+    #dynamic-fields .form-group { margin-bottom:1.1rem; }
+
+    /* ERROR / SUCCESS */
+    #msg-box {
+      border-radius:8px; padding:0.7rem 1rem; font-size:0.87rem;
+      margin-bottom:1rem; display:none; align-items:center; gap:0.5rem;
+    }
+    #msg-box.error-box { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); color:var(--error); }
+    #msg-box.success-box { background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2); color:var(--success); }
+    #msg-box.show { display:flex; }
+
+    /* SUBMIT */
+    .btn-register {
+      width:100%; padding:0.82rem; background:var(--teal); color:var(--white);
+      border:none; border-radius:10px; font-size:0.97rem; font-weight:700;
+      cursor:pointer; transition:all 0.3s; font-family:'Inter',sans-serif;
+      display:flex; align-items:center; justify-content:center; gap:0.5rem; margin-top:0.5rem;
+    }
+    .btn-register:hover { background:var(--teal-dark); transform:translateY(-1px); box-shadow:0 4px 15px rgba(10,147,150,0.35); }
+
+    .login-link { text-align:center; margin-top:1.2rem; font-size:0.87rem; color:var(--text-muted); }
+    .login-link a { color:var(--teal); font-weight:600; text-decoration:none; }
+    .login-link a:hover { text-decoration:underline; }
+  </style>
+</head>
+<body>
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="brand">
+      <div class="brand-logo">
+        <i class="fa-solid fa-brain"></i>
+        <span>MindAIde</span>
+      </div>
+      <h2>Start your mental wellness journey today</h2>
+      <p>Join thousands who trust MindAIde for compassionate, AI-powered mental health support.</p>
+      <div class="role-cards">
+        <div class="role-card">
+          <i class="fa-solid fa-user-injured"></i>
+          <div><strong>Patient</strong><small>Access AI chat, quiz & self-care</small></div>
+        </div>
+        <div class="role-card">
+          <i class="fa-solid fa-user-doctor"></i>
+          <div><strong>Therapist</strong><small>Manage appointments & patients</small></div>
+        </div>
+        <div class="role-card">
+          <i class="fa-solid fa-hand-holding-heart"></i>
+          <div><strong>Caretaker</strong><small>Monitor & support loved ones</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <a href="{{ url_for('auth.home') }}" class="back-home"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+
+    <div class="reg-header">
+      <h1>Create your account</h1>
+      <p>Fill in the details below to get started</p>
+    </div>
+
+    <div id="msg-box">
+      <i class="fa-solid fa-circle-exclamation" id="msg-icon"></i>
+      <span id="msg-text"></span>
+    </div>
+
+    <form id="register-form">
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-user icon"></i>
+          <input type="text" class="form-input" id="name" name="name" placeholder="Enter your full name" required/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-envelope icon"></i>
+          <input type="email" class="form-input" id="email" name="email" placeholder="you@example.com" required/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Select Role</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-user-tag icon"></i>
+          <select class="form-select" id="role" name="role" required>
+            <option value="">Choose your role...</option>
+            <option value="Patient">Patient</option>
+            <option value="Therapist">Therapist</option>
+            <option value="Caretaker">Caretaker</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Dynamic fields injected by register.js -->
+      <div id="dynamic-fields"></div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-lock icon"></i>
+          <input type="password" class="form-input" id="password" name="password" placeholder="Min. 6 chars with letters & numbers" required/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-lock icon"></i>
+          <input type="password" class="form-input" id="confirm_password" name="confirm_password" placeholder="Repeat your password" required/>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-register">
+        <i class="fa-solid fa-user-plus"></i> Create Account
+      </button>
+    </form>
+
+    <div class="login-link">Already have an account? <a href="{{ url_for('auth.login') }}">Sign in</a></div>
+  </div>
+
+  <script>
+    // Show message helper (used by register.js too)
+    function showMsg(text, isError) {
+      const box = document.getElementById('msg-box');
+      const icon = document.getElementById('msg-icon');
+      const msg = document.getElementById('msg-text');
+      box.className = isError ? 'error-box show' : 'success-box show';
+      icon.className = isError ? 'fa-solid fa-circle-exclamation' : 'fa-solid fa-circle-check';
+      msg.textContent = text;
+      box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  </script>
+</body>
+</html>

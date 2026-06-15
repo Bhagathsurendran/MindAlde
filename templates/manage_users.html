@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Users - MindAIde</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --teal: #0a9396; --teal-dark: #005f73; --teal-light: #94d2bd;
+      --navy: #0d1b2a; --white: #ffffff; --light: #f3f4f6;
+      --text: #1f2937; --text-muted: #6b7280; --border: #e5e7eb;
+      --danger: #ef4444; --warning: #f59e0b;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:var(--light); min-height:100vh; }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      background:var(--navy); padding:0 2rem;
+      display:flex; align-items:center; justify-content:space-between;
+      height:64px; position:sticky; top:0; z-index:100;
+      box-shadow:0 2px 12px rgba(0,0,0,0.25);
+    }
+    .nav-brand { display:flex; align-items:center; gap:0.6rem; text-decoration:none; }
+    .nav-brand i { font-size:1.3rem; color:var(--teal-light); }
+    .nav-brand span { font-size:1.2rem; font-weight:800; color:var(--white); }
+    .btn-back {
+      display:flex; align-items:center; gap:0.4rem;
+      background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
+      color:rgba(255,255,255,0.8); padding:0.45rem 1rem; border-radius:8px;
+      text-decoration:none; font-size:0.85rem; font-weight:500; transition:all 0.2s;
+    }
+    .btn-back:hover { background:rgba(255,255,255,0.15); color:white; }
+
+    /* ── MAIN ── */
+    .main { max-width:1000px; margin:0 auto; padding:3rem 1.5rem; }
+
+    .header-section { margin-bottom:2rem; display:flex; justify-content:space-between; align-items:center; }
+    .header-section h1 { font-size:1.8rem; font-weight:800; color:var(--text); letter-spacing:-0.5px; }
+
+    /* ── TABLE ── */
+    .table-container {
+      background:var(--white); border-radius:16px; border:1px solid var(--border);
+      overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.03);
+    }
+    table { width:100%; border-collapse:collapse; text-align:left; }
+    
+    th {
+      background:rgba(10,147,150,0.05); color:var(--teal-dark);
+      font-weight:700; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px;
+      padding:1.25rem 1.5rem; border-bottom:1.5px solid var(--border);
+    }
+    td {
+      padding:1.25rem 1.5rem; border-bottom:1px solid var(--border);
+      color:var(--text); font-size:0.95rem; font-weight:500;
+    }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:var(--light); }
+
+    .td-av { display:flex; align-items:center; gap:0.75rem; }
+    .av-icon { width:36px; height:36px; border-radius:10px; background:var(--light); display:flex; align-items:center; justify-content:center; color:var(--teal); font-size:1.1rem; }
+    
+    .td-email { color:var(--text-muted); font-size:0.9rem; }
+
+    /* ── ACTIONS ── */
+    .actions { display:flex; gap:0.5rem; justify-content:flex-start; }
+    .btn-action {
+      padding:0.5rem 0.85rem; border-radius:8px; font-size:0.85rem; font-weight:600;
+      text-decoration:none; display:flex; align-items:center; gap:0.3rem; transition:0.2s;
+    }
+    .btn-edit { background:rgba(245,158,11,0.1); color:#d97706; }
+    .btn-edit:hover { background:#f59e0b; color:var(--white); }
+    .btn-delete { background:rgba(239,68,68,0.1); color:#dc2626; }
+    .btn-delete:hover { background:#ef4444; color:var(--white); }
+
+    .empty-state { padding:4rem 2rem; text-align:center; color:var(--text-muted); }
+    .empty-state i { font-size:3rem; color:var(--border); margin-bottom:1rem; }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a class="nav-brand" href="{{ url_for('auth.admin_dashboard') }}">
+      <i class="fa-solid fa-brain"></i>
+      <span>MindAIde</span>
+    </a>
+    <a href="{{ url_for('auth.admin_dashboard') }}" class="btn-back">
+      <i class="fa-solid fa-arrow-left"></i> Admin Hub
+    </a>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="header-section">
+      <h1>Manage System Users</h1>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Email Address</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>
+              <div class="td-av">
+                <div class="av-icon"><i class="fa-solid fa-user"></i></div>
+                <span>{{ user['name'] }}</span>
+              </div>
+            </td>
+            <td class="td-email"><i class="fa-solid fa-envelope" style="margin-right:6px; opacity:0.6;"></i> {{ user['email'] }}</td>
+            <td>
+              <div class="actions">
+                <a href="{{ url_for('auth.edit_user', user_id=user['_id']|string) }}" class="btn-action btn-edit"><i class="fa-solid fa-pen"></i> Edit</a>
+                <a href="{{ url_for('auth.delete_user', user_id=user['_id']|string) }}" class="btn-action btn-delete" onclick="return confirm('Are you sure you want to delete this user?');"><i class="fa-solid fa-trash"></i> Delete</a>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="3">
+              <div class="empty-state">
+                <i class="fa-regular fa-folder-open"></i>
+                <h3>No Users Found</h3>
+                <p>There are currently no patients or caretakers registered.</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </main>
+</body>
+</html>

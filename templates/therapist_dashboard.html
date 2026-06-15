@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Therapist Dashboard - MindAIde</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --teal: #0a9396; --teal-dark: #005f73; --teal-light: #94d2bd;
+      --navy: #0d1b2a; --white: #ffffff; --light: #f3f4f6;
+      --text: #1f2937; --text-muted: #6b7280; --border: #e5e7eb;
+      --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:var(--light); min-height:100vh; }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      background:var(--navy); padding:0 2rem;
+      display:flex; align-items:center; justify-content:space-between;
+      height:64px; position:sticky; top:0; z-index:100;
+      box-shadow:0 2px 12px rgba(0,0,0,0.25);
+    }
+    .nav-brand { display:flex; align-items:center; gap:0.6rem; text-decoration:none; }
+    .nav-brand i { font-size:1.3rem; color:var(--teal-light); }
+    .nav-brand span { font-size:1.2rem; font-weight:800; color:var(--white); }
+    .nav-right { display:flex; align-items:center; gap:1rem; }
+    .nav-user { display:flex; align-items:center; gap:0.5rem; color:rgba(255,255,255,0.75); font-size:0.88rem; }
+    .nav-user span.badge { background:var(--teal); color:var(--white); padding:0.1rem 0.5rem; border-radius:4px; font-size:0.75rem; font-weight:700; margin-left:0.3rem; }
+    .nav-user i { color:var(--teal-light); }
+    .btn-logout {
+      display:flex; align-items:center; gap:0.4rem;
+      background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
+      color:rgba(255,255,255,0.8); padding:0.45rem 1rem; border-radius:8px;
+      text-decoration:none; font-size:0.85rem; font-weight:500; transition:all 0.2s;
+    }
+    .btn-logout:hover { background:rgba(239,68,68,0.2); border-color:rgba(239,68,68,0.3); color:white; }
+
+    /* ── MAIN ── */
+    .main { max-width:1100px; margin:0 auto; padding:2.5rem 1.5rem; }
+
+    /* ── WELCOME BANNER ── */
+    .welcome-banner {
+      background:linear-gradient(135deg, var(--teal-dark) 0%, var(--teal) 100%);
+      border-radius:20px; padding:2.5rem; margin-bottom:2.5rem;
+      display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;
+      box-shadow:0 8px 24px rgba(10,147,150,0.3);
+    }
+    .welcome-text h1 { font-size:1.75rem; font-weight:800; color:var(--white); margin-bottom:0.3rem; }
+    .welcome-text p { color:rgba(255,255,255,0.85); font-size:0.95rem; }
+    .welcome-icon { font-size:3.5rem; opacity:0.3; }
+
+    /* ── FLASH MESSAGES (ALERTS) ── */
+    .alert { padding:1rem 1.25rem; border-radius:10px; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.75rem; font-size:0.95rem; font-weight:500; }
+    .alert-success { background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.2); color:#065f46; }
+    .alert-danger { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); color:#991b1b; }
+    .alert-info { background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.2); color:#1e40af; }
+    .alert i { font-size:1.1rem; }
+
+    /* ── SECTION TITLE ── */
+    .section-title { font-size:1.2rem; font-weight:700; color:var(--text); margin-bottom:1.25rem; display:flex; align-items:center; gap:0.5rem; }
+    .section-title i { color:var(--teal); }
+
+    /* ── APPOINTMENT GRID ── */
+    .req-grid {
+      display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:1.5rem;
+    }
+    .req-card {
+      background:var(--white); border-radius:16px; border:1px solid var(--border);
+      padding:1.5rem; transition:box-shadow 0.2s; position:relative; overflow:hidden;
+    }
+    .req-card:hover { box-shadow:0 8px 25px rgba(0,0,0,0.06); }
+    
+    .status-badge {
+      display:inline-block; padding:0.3rem 0.8rem; border-radius:999px;
+      font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:1rem;
+    }
+    .status-Pending { background:rgba(245,158,11,0.15); color:#b45309; border:1px solid rgba(245,158,11,0.3); }
+    .status-Accepted { background:rgba(16,185,129,0.15); color:#047857; border:1px solid rgba(16,185,129,0.3); }
+    .status-Rejected { background:rgba(239,68,68,0.15); color:#b91c1c; border:1px solid rgba(239,68,68,0.3); }
+
+    .pat-info { display:flex; gap:0.75rem; margin-bottom:1.2rem; }
+    .pat-av { width:46px; height:46px; border-radius:12px; background:var(--light); display:flex; align-items:center; justify-content:center; color:var(--teal); font-size:1.2rem; }
+    .pat-details h3 { font-size:1.05rem; font-weight:700; color:var(--text); margin-bottom:0.1rem; }
+    .pat-details p { font-size:0.85rem; color:var(--text-muted); }
+
+    .req-meta { background:var(--light); border-radius:10px; padding:1rem; margin-bottom:1.25rem; }
+    .meta-row { display:flex; justify-content:space-between; margin-bottom:0.5rem; font-size:0.85rem; }
+    .meta-row:last-child { margin-bottom:0; }
+    .meta-label { color:var(--text-muted); font-weight:500; }
+    .meta-value { color:var(--text); font-weight:600; text-align:right; }
+    .meta-concern { display:block; margin-top:0.75rem; padding-top:0.75rem; border-top:1px dashed var(--border); }
+    .meta-concern span { display:block; color:var(--text); font-weight:600; margin-top:0.25rem; }
+
+    /* ── ACTION BUTTONS ── */
+    .req-actions { display:flex; gap:0.75rem; }
+    .btn-act { flex:1; padding:0.7rem; border-radius:8px; font-size:0.9rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:0.4rem; transition:all 0.2s; border:none; color:white; }
+    .btn-accept { background:var(--success); }
+    .btn-accept:hover { background:#059669; }
+    .btn-reject { background:var(--white); color:var(--danger); border:1.5px solid rgba(239,68,68,0.3); }
+    .btn-reject:hover { background:rgba(239,68,68,0.1); border-color:var(--danger); }
+    
+    .empty-state {
+      text-align:center; padding:4rem 2rem; background:var(--white);
+      border-radius:16px; border:1px dashed var(--border); color:var(--text-muted);
+    }
+    .empty-state i { font-size:3rem; color:var(--border); margin-bottom:1rem; }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a class="nav-brand" href="#">
+      <i class="fa-solid fa-brain"></i>
+      <span>MindAIde</span>
+    </a>
+    <div class="nav-right">
+      <div class="nav-user">
+        <i class="fa-solid fa-user-doctor"></i>
+        <span>Dr. {{ session.get('user', {}).get('name', 'Therapist') }}</span>
+        <span class="badge" style="background:var(--accent);">PRO</span>
+      </div>
+      <a href="{{ url_for('auth.logout') }}" class="btn-logout">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </a>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- WELCOME BANNER -->
+    <div class="welcome-banner">
+      <div class="welcome-text">
+        <h1>Your Practice Dashboard</h1>
+        <p>Manage your patient appointments, review new requests, and provide care.</p>
+      </div>
+      <div class="welcome-icon"><i class="fa-solid fa-stethoscope"></i></div>
+    </div>
+
+    <!-- FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <!-- Map bootstrap categories to our custom ones -->
+          {% set alert_type = category if category in ['success', 'danger', 'info'] else 'info' %}
+          <div class="alert alert-{{ alert_type }}">
+            <i class="fa-solid fa-circle-info"></i> {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- APPOINTMENTS LIST -->
+    <div class="section-title"><i class="fa-regular fa-calendar-check"></i> Appointment Requests</div>
+    
+    {% if requests %}
+      <div class="req-grid">
+        {% for req in requests %}
+          <div class="req-card">
+            <span class="status-badge status-{{ req.status }}">{{ req.status }}</span>
+            
+            <div class="pat-info">
+              <div class="pat-av"><i class="fa-solid fa-user"></i></div>
+              <div class="pat-details">
+                <h3>{{ req.patient_name or 'N/A' }}</h3>
+                <p>{{ req.patient_email or 'N/A' }}</p>
+              </div>
+            </div>
+
+            <div class="req-meta">
+              <div class="meta-row">
+                <span class="meta-label">Age</span>
+                <span class="meta-value">{{ req.patient_age or 'N/A' }}</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Gender</span>
+                <span class="meta-value">{{ req.patient_gender or 'N/A' }}</span>
+              </div>
+              <div class="meta-concern">
+                <span class="meta-label">Primary Concern:</span>
+                <span>{{ req.interest or 'General Consultation' }}</span>
+              </div>
+            </div>
+
+            {% if req.status == 'Pending' %}
+              <div class="req-actions">
+                <!-- Using GET method forms as per original structure perfectly matched to Flask routes -->
+                <form method="GET" action="{{ url_for('therapists.accept_appointment', appointment_id=req._id) }}" style="flex:1;">
+                  <button type="submit" class="action-btn btn-accept"><i class="fa-solid fa-check"></i> Accept</button>
+                </form>
+                <form method="GET" action="{{ url_for('therapists.reject_appointment', appointment_id=req._id) }}" style="flex:1;">
+                  <button type="submit" class="btn-act btn-reject"><i class="fa-solid fa-xmark"></i> Decline</button>
+                </form>
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i class="fa-regular fa-envelope-open"></i>
+        <h3>No requests yet</h3>
+        <p>You don't have any pending appointment requests at the moment.</p>
+      </div>
+    {% endif %}
+
+  </main>
+</body>
+</html>

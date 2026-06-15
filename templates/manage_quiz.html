@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Quiz - MindAIde</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --teal: #0a9396; --teal-dark: #005f73; --teal-light: #94d2bd;
+      --navy: #0d1b2a; --white: #ffffff; --light: #f3f4f6;
+      --text: #1f2937; --text-muted: #6b7280; --border: #e5e7eb;
+      --danger: #ef4444; --warning: #f59e0b;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:var(--light); min-height:100vh; }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      background:var(--navy); padding:0 2rem;
+      display:flex; align-items:center; justify-content:space-between;
+      height:64px; position:sticky; top:0; z-index:100;
+      box-shadow:0 2px 12px rgba(0,0,0,0.25);
+    }
+    .nav-brand { display:flex; align-items:center; gap:0.6rem; text-decoration:none; }
+    .nav-brand i { font-size:1.3rem; color:var(--teal-light); }
+    .nav-brand span { font-size:1.2rem; font-weight:800; color:var(--white); }
+    .btn-back {
+      display:flex; align-items:center; gap:0.4rem;
+      background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
+      color:rgba(255,255,255,0.8); padding:0.45rem 1rem; border-radius:8px;
+      text-decoration:none; font-size:0.85rem; font-weight:500; transition:all 0.2s;
+    }
+    .btn-back:hover { background:rgba(255,255,255,0.15); color:white; }
+
+    /* ── MAIN ── */
+    .main { max-width:1200px; margin:0 auto; padding:3rem 1.5rem; }
+
+    .header-section { margin-bottom:2rem; }
+    .header-section h1 { font-size:1.8rem; font-weight:800; color:var(--text); letter-spacing:-0.5px; margin-bottom:0.5rem; }
+    .header-section p { color:var(--text-muted); font-size:0.95rem; }
+
+    /* ── ADD NEW QUESTION FORM ── */
+    .add-form-container {
+      background:var(--white); border-radius:16px; border:1px solid var(--border);
+      padding:2rem; margin-bottom:3rem; box-shadow:0 4px 20px rgba(0,0,0,0.03);
+    }
+    .add-form-container h3 { font-size:1.2rem; font-weight:700; color:var(--text); margin-bottom:1.5rem; display:flex; align-items:center; gap:0.5rem; }
+    .add-form-container h3 i { color:var(--teal); }
+
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
+    .form-group-full { grid-column:1 / -1; }
+    
+    .form-input, .form-select {
+      width:100%; padding:0.85rem 1rem; font-size:0.95rem; font-family:'Inter',sans-serif; color:var(--text);
+      border:1.5px solid var(--border); border-radius:10px; background:var(--light); outline:none; transition:0.2s;
+    }
+    .form-input:focus, .form-select:focus { border-color:var(--teal); background:var(--white); box-shadow:0 0 0 3px rgba(10,147,150,0.1); }
+    
+    .form-select {
+      appearance:none; cursor:pointer;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:right 1rem center; background-size:1em;
+    }
+
+    .btn-submit {
+      width:100%; padding:1rem; background:var(--teal); color:var(--white);
+      border:none; border-radius:10px; font-size:1rem; font-weight:700;
+      cursor:pointer; transition:all 0.3s; margin-top:1.5rem; display:flex; align-items:center; justify-content:center; gap:0.5rem;
+    }
+    .btn-submit:hover { background:var(--teal-dark); transform:translateY(-1px); }
+
+    /* ── TABLE ── */
+    .table-container {
+      background:var(--white); border-radius:16px; border:1px solid var(--border);
+      overflow-x:auto; box-shadow:0 4px 20px rgba(0,0,0,0.03);
+    }
+    table { width:100%; border-collapse:collapse; text-align:left; min-width:900px; }
+    
+    th {
+      background:rgba(10,147,150,0.05); color:var(--teal-dark);
+      font-weight:700; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.5px;
+      padding:1.1rem 1.5rem; border-bottom:1.5px solid var(--border);
+    }
+    td {
+      padding:1.1rem 1.5rem; border-bottom:1px solid var(--border);
+      color:var(--text); font-size:0.92rem; font-weight:500; vertical-align:top; line-height:1.5;
+    }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:var(--light); }
+
+    .question-options { list-style:none; margin-top:0.5rem; padding-left:0; font-size:0.85rem; color:var(--text-muted); }
+    .question-options li { display:flex; align-items:flex-start; gap:0.4rem; margin-bottom:0.25rem; }
+    .question-options li::before { content:'•'; color:var(--teal); font-weight:bold; }
+    
+    .category-badge {
+      display:inline-block; padding:0.2rem 0.6rem; border-radius:6px;
+      font-size:0.75rem; font-weight:700; text-transform:uppercase; background:rgba(10,147,150,0.1); color:var(--teal-dark); border:1px solid rgba(10,147,150,0.2);
+    }
+
+    /* ── ACTIONS ── */
+    .actions { display:flex; gap:0.5rem; justify-content:flex-start; }
+    .btn-action {
+      padding:0.4rem 0.75rem; border-radius:8px; font-size:0.8rem; font-weight:600;
+      text-decoration:none; display:flex; align-items:center; gap:0.3rem; transition:0.2s; border:none; cursor:pointer;
+    }
+    .btn-edit { background:rgba(245,158,11,0.1); color:#d97706; }
+    .btn-edit:hover { background:#f59e0b; color:var(--white); }
+    .btn-delete { background:rgba(239,68,68,0.1); color:#dc2626; }
+    .btn-delete:hover { background:#ef4444; color:var(--white); }
+
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a class="nav-brand" href="{{ url_for('auth.admin_dashboard') }}">
+      <i class="fa-solid fa-brain"></i>
+      <span>MindAIde</span>
+    </a>
+    <a href="{{ url_for('auth.admin_dashboard') }}" class="btn-back">
+      <i class="fa-solid fa-arrow-left"></i> Admin Hub
+    </a>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="header-section">
+      <h1>Manage Quiz Database</h1>
+      <p>Add, edit, or remove the questions used in the mental health assessment quiz.</p>
+    </div>
+
+    <!-- NEW QUESTION FORM -->
+    <div class="add-form-container">
+      <h3><i class="fa-solid fa-plus-circle"></i> Add a New Question</h3>
+      <form method="POST" action="{{ url_for('quiz.manage_quiz') }}">
+        
+        <div class="form-grid">
+          <div class="form-group-full">
+            <input type="text" name="question_text" class="form-input" placeholder="Enter Question text..." required>
+          </div>
+          
+          <input type="text" name="option1" class="form-input" placeholder="Option 1 (e.g. Always)" required>
+          <input type="text" name="option2" class="form-input" placeholder="Option 2 (e.g. Often)" required>
+          <input type="text" name="option3" class="form-input" placeholder="Option 3 (e.g. Rarely)" required>
+          <input type="text" name="option4" class="form-input" placeholder="Option 4 (e.g. Never)" required>
+          
+          <div class="form-group-full">
+            <select name="category" class="form-select" required>
+              <option value="" disabled selected>Select Primary Category / Trait</option>
+              <option value="Anxiety">Anxiety</option>
+              <option value="Depression">Depression</option>
+              <option value="Stress">Stress</option>
+              <option value="Normal">Normal</option>
+            </select>
+          </div>
+        </div>
+        
+        <button type="submit" class="btn-submit"><i class="fa-solid fa-floppy-disk"></i> Save Question to Database</button>
+      </form>
+    </div>
+
+    <!-- CURRENT QUESTIONS TABLE -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Question</th>
+            <th>Category</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for question in questions %}
+          <tr>
+            <td style="max-width:500px;">
+              <strong>{{ question.get('question_text', 'No Question Found') }}</strong>
+              <ul class="question-options">
+                {% for option in question.get('options', []) %}
+                <li>{{ option.get('text', 'No Option Found') }}</li>
+                {% endfor %}
+              </ul>
+            </td>
+            <td>
+              <span class="category-badge">{{ question.get('category', 'No Category') }}</span>
+            </td>
+            <td>
+              <div class="actions">
+                <a href="{{ url_for('quiz.edit_quiz', question_id=question['_id']|string) }}" class="btn-action btn-edit"><i class="fa-solid fa-pen"></i> Edit</a>
+                <a href="{{ url_for('quiz.delete_quiz', question_id=question['_id']|string) }}" class="btn-action btn-delete" onclick="return confirm('Are you sure you want to permanently delete this question?');"><i class="fa-solid fa-trash"></i> Delete</a>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="3" style="text-align:center; padding:3rem; color:var(--text-muted);">
+              <i class="fa-regular fa-folder-open" style="font-size:2rem; margin-bottom:1rem; opacity:0.5;"></i>
+              <p>No quiz questions found in the database.</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assessment Result - MindAIde</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --teal: #0a9396; --teal-dark: #005f73; --teal-light: #94d2bd;
+      --navy: #0d1b2a; --white: #ffffff; --light: #f3f4f6;
+      --text: #1f2937; --text-muted: #6b7280; --border: #e5e7eb;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:var(--light); min-height:100vh; }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      background:var(--navy); padding:0 2rem;
+      display:flex; align-items:center; justify-content:space-between;
+      height:64px; position:sticky; top:0; z-index:100;
+      box-shadow:0 2px 12px rgba(0,0,0,0.25);
+    }
+    .nav-brand { display:flex; align-items:center; gap:0.6rem; text-decoration:none; }
+    .nav-brand i { font-size:1.3rem; color:var(--teal-light); }
+    .nav-brand span { font-size:1.2rem; font-weight:800; color:var(--white); }
+    .btn-back {
+      display:flex; align-items:center; gap:0.4rem;
+      background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
+      color:rgba(255,255,255,0.8); padding:0.45rem 1rem; border-radius:8px;
+      text-decoration:none; font-size:0.85rem; font-weight:500; transition:all 0.2s;
+    }
+    .btn-back:hover { background:rgba(255,255,255,0.15); color:white; }
+
+    /* ── MAIN ── */
+    .main { max-width:600px; margin:4rem auto 2rem; padding:0 1.5rem; text-align:center; }
+
+    .result-card {
+      background:var(--white); border-radius:20px; padding:3.5rem 2.5rem;
+      box-shadow:0 10px 40px rgba(0,0,0,0.06); border:1px solid var(--border);
+    }
+
+    .result-icon {
+      width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+      font-size:2.5rem; margin:0 auto 1.5rem;
+    }
+    .icon-Normal { background:rgba(16,185,129,0.1); color:#10b981; }
+    .icon-Stress { background:rgba(245,158,11,0.1); color:#f59e0b; }
+    .icon-Anxiety { background:rgba(59,130,246,0.1); color:#3b82f6; }
+    .icon-Depression { background:rgba(99,102,241,0.1); color:#6366f1; }
+
+    .result-card h1 { font-size:1.8rem; font-weight:800; color:var(--text); margin-bottom:0.5rem; letter-spacing:-0.5px; }
+    .result-badge {
+      display:inline-block; padding:0.5rem 1.25rem; border-radius:999px;
+      font-size:1.2rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:1.5rem;
+    }
+    .badge-Normal { background:#10b981; color:white; }
+    .badge-Stress { background:#f59e0b; color:white; }
+    .badge-Anxiety { background:#3b82f6; color:white; }
+    .badge-Depression { background:#6366f1; color:white; }
+
+    .result-message { font-size:1.05rem; color:var(--text-muted); line-height:1.6; margin-bottom:2.5rem; }
+
+    /* ── ACTIONS ── */
+    .actions-grid {
+      display:grid; grid-template-columns:1fr 1fr; gap:1rem;
+    }
+    .action-btn {
+      padding:1rem; border-radius:12px; font-weight:600; font-size:0.95rem;
+      text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:0.5rem;
+      transition:all 0.3s; border:1.5px solid transparent;
+    }
+    .action-btn i { font-size:1.4rem; }
+    
+    .btn-retake { background:var(--light); color:var(--text); border-color:var(--border); }
+    .btn-retake:hover { background:var(--white); border-color:var(--teal); color:var(--teal); }
+    
+    .btn-next { background:var(--teal); color:var(--white); }
+    .btn-next:hover { background:var(--teal-dark); transform:translateY(-2px); box-shadow:0 6px 15px rgba(10,147,150,0.25); }
+
+    @media (max-width: 600px) {
+      .actions-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a class="nav-brand" href="{{ url_for('auth.dashboard') }}">
+      <i class="fa-solid fa-brain"></i>
+      <span>MindAIde</span>
+    </a>
+    <a href="{{ url_for('auth.dashboard') }}" class="btn-back">
+      <i class="fa-solid fa-house"></i> Home
+    </a>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="result-card">
+
+      <!-- Dynamic Icon -->
+      {% if result == "Normal" %}
+        <div class="result-icon icon-Normal"><i class="fa-solid fa-face-smile-beam"></i></div>
+      {% elif result == "Stress" %}
+        <div class="result-icon icon-Stress"><i class="fa-solid fa-bolt"></i></div>
+      {% elif result == "Anxiety" %}
+        <div class="result-icon icon-Anxiety"><i class="fa-solid fa-wind"></i></div>
+      {% elif result == "Depression" %}
+        <div class="result-icon icon-Depression"><i class="fa-solid fa-cloud-rain"></i></div>
+      {% else %}
+        <div class="result-icon icon-Normal"><i class="fa-solid fa-clipboard-check"></i></div>
+      {% endif %}
+
+      <h1>Your Assessment Result</h1>
+      <div class="result-badge badge-{{ result|default('Normal') }}">{{ result }}</div>
+
+      <!-- Dynamic Messages -->
+      <p class="result-message">
+        {% if result == "Normal" %}
+          Great job! Keep taking care of yourself. Stay positive and keep spreading joy! Remember that mental maintenance is just as important as physical health.
+        {% elif result == "Stress" %}
+          It's okay to feel stressed sometimes. Take deep breaths, rest well, and engage in activities that bring you peace. You might benefit from some mindfulness exercises.
+        {% elif result == "Anxiety" %}
+          You are not alone! Try relaxation techniques, reach out to loved ones, and remember, every challenge is temporary. Consider talking to one of our therapists.
+        {% elif result == "Depression" %}
+          You are strong, and your feelings are valid. Seek support, practice self-care, and know that brighter days are ahead. We highly recommend connecting with a professional on our platform.
+        {% endif %}
+      </p>
+
+      <div class="actions-grid">
+        <a href="{{ url_for('quiz.quiz_page') }}" class="action-btn btn-retake">
+          <i class="fa-solid fa-rotate-right"></i>
+          <span>Retake Quiz</span>
+        </a>
+        <a href="{{ url_for('selfcare.selfcare_home') }}" class="action-btn btn-next">
+          <i class="fa-solid fa-heart-pulse"></i>
+          <span>View Self-Care Plan</span>
+        </a>
+      </div>
+
+    </div>
+  </main>
+</body>
+</html>

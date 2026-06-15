@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Self-Care - MindAIde</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --teal: #0a9396; --teal-dark: #005f73; --teal-light: #94d2bd;
+      --navy: #0d1b2a; --white: #ffffff; --light: #f3f4f6;
+      --text: #1f2937; --text-muted: #6b7280; --border: #e5e7eb;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:var(--light); min-height:100vh; }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      background:var(--navy); padding:0 2rem;
+      display:flex; align-items:center; justify-content:space-between;
+      height:64px; position:sticky; top:0; z-index:100;
+      box-shadow:0 2px 12px rgba(0,0,0,0.25);
+    }
+    .nav-brand { display:flex; align-items:center; gap:0.6rem; text-decoration:none; }
+    .nav-brand i { font-size:1.3rem; color:var(--teal-light); }
+    .nav-brand span { font-size:1.2rem; font-weight:800; color:var(--white); }
+    .btn-back {
+      display:flex; align-items:center; gap:0.4rem;
+      background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
+      color:rgba(255,255,255,0.8); padding:0.45rem 1rem; border-radius:8px;
+      text-decoration:none; font-size:0.85rem; font-weight:500; transition:all 0.2s;
+    }
+    .btn-back:hover { background:rgba(255,255,255,0.15); color:white; }
+
+    /* ── MAIN ── */
+    .main { max-width:600px; margin:4rem auto 2rem; padding:0 1.5rem; text-align:center; }
+
+    .care-card {
+      background:var(--white); border-radius:20px; padding:3.5rem 2.5rem;
+      box-shadow:0 10px 40px rgba(0,0,0,0.06); border:1px solid var(--border);
+    }
+
+    .care-icon {
+      width:80px; height:80px; border-radius:50%; background:rgba(10,147,150,0.1); color:var(--teal);
+      display:flex; align-items:center; justify-content:center;
+      font-size:2.5rem; margin:0 auto 1.5rem;
+    }
+
+    .care-card h1 { font-size:1.8rem; font-weight:800; color:var(--text); margin-bottom:0.75rem; letter-spacing:-0.5px; }
+    .care-quote { font-style:italic; font-size:1rem; color:var(--text-muted); line-height:1.6; margin-bottom:2.5rem; padding:0 1rem; border-left:3px solid var(--teal-light); text-align:left; }
+
+    /* ── FORM ── */
+    .form-group { text-align:left; margin-bottom:2rem; }
+    .form-label { display:block; font-size:0.95rem; font-weight:700; color:var(--text); margin-bottom:0.75rem; }
+    
+    .form-select {
+      width:100%; padding:1rem 1.25rem; font-size:1rem; font-family:'Inter',sans-serif; color:var(--text);
+      border:1.5px solid var(--border); border-radius:12px; background:var(--white);
+      outline:none; transition:all 0.2s; appearance:none; cursor:pointer;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:right 1.25rem center; background-size:1em;
+    }
+    .form-select:focus { border-color:var(--teal); box-shadow:0 0 0 3px rgba(10,147,150,0.15); }
+
+    .btn-action {
+      width:100%; padding:1.1rem; background:var(--teal); color:var(--white);
+      border:none; border-radius:12px; font-size:1.05rem; font-weight:700;
+      cursor:pointer; transition:all 0.3s; font-family:'Inter',sans-serif;
+      display:flex; align-items:center; justify-content:center; gap:0.5rem;
+    }
+    .btn-action:hover { background:var(--teal-dark); transform:translateY(-2px); box-shadow:0 6px 20px rgba(10,147,150,0.3); }
+
+    #suggestions { margin-top:1.5rem; font-size:0.95rem; color:var(--text); text-align:left; }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a class="nav-brand" href="{{ url_for('auth.dashboard') }}">
+      <i class="fa-solid fa-brain"></i>
+      <span>MindAIde</span>
+    </a>
+    <a href="{{ url_for('auth.dashboard') }}" class="btn-back">
+      <i class="fa-solid fa-arrow-left"></i> Dashboard
+    </a>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="care-card">
+
+      <div class="care-icon"><i class="fa-solid fa-spa"></i></div>
+      
+      <h1>Self-Care Planner</h1>
+      <div class="care-quote">
+        "Self-care is not a luxury, it’s a necessity. Take care of yourself first, so you can take care of others."
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="category">What area do you want to focus on?</label>
+        <select id="category" class="form-select">
+          <option value="Anxiety">Managing Anxiety</option>
+          <option value="Depression">Coping with Depression</option>
+          <option value="Stress">Reducing Stress</option>
+          <option value="Normal">General Wellness (Normal)</option>
+        </select>
+      </div>
+
+      <button id="getSuggestionsBtn" class="btn-action">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Get Personalized Activities
+      </button>
+
+      <div id="suggestions"></div>
+
+    </div>
+  </main>
+
+  <script>
+    document.getElementById("getSuggestionsBtn").addEventListener("click", function () {
+      const selectedCategory = document.getElementById("category").value;
+      if (selectedCategory) {
+        window.location.href = "{{ url_for('selfcare.suggestions_page') }}?category=" + encodeURIComponent(selectedCategory); 
+      } else {
+        alert("Please select a category!");
+      }
+    });
+  </script>
+
+</body>
+</html>

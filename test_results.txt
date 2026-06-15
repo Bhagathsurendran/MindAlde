@@ -1,0 +1,37 @@
+--- Register Patient ---
+Status Code: 201
+JSON: {'success': True, 'message': 'Account created successfully!'}
+
+--- Register Therapist ---
+Status Code: 201
+JSON: {'success': True, 'message': 'Account created successfully!'}
+
+--- Login Success ---
+Status Code: 200
+JSON: {'redirect': '/dashboard'}
+
+--- Login Failure ---
+Status Code: 400
+JSON: {'error': 'Invalid credentials. Try again!'}
+
+--- Chatbot ---
+Status Code: 200
+Text: {"response": "I'm a little busy right now, please try again in a moment! \ud83d\ude0a"}
+
+--- Self-care get_suggestions ---
+Status Code: 500
+Text: <!doctype html>
+<html lang=en>
+  <head>
+    <title>NameError: name &#39;suggestion_collection&#39; is not defined
+ // Werkzeug Debugger</title>
+    <link rel="stylesheet" href="?__debugger__=yes&amp;c
+
+--- Self-care save_activity ---
+Status Code: 201
+JSON: {'message': 'Activity saved with reminder!'}
+
+--- Self-care get_activities ---
+Status Code: 200
+JSON: [{'_id': '69b2d3817d99a297bb38644c', 'user_id': 'dummy_b9a5be9e', 'title': 'Yoga', 'reminder_time': '2026-05-01 10:00', 'status': 'pending'}]
+

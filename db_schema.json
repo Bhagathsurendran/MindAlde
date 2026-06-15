@@ -1,0 +1,38 @@
+{
+    "collections": [
+        "users",
+        "selfcare_resources",
+        "therapists",
+        "selfcare_suggestions"
+    ],
+    "schemas": {
+        "users": {
+            "_id": "ObjectId",
+            "name": "str",
+            "email": "str",
+            "password": "str",
+            "role": "str",
+            "verified": "bool"
+        },
+        "selfcare_resources": {
+            "_id": "ObjectId",
+            "category": "str",
+            "resources": "dict"
+        },
+        "therapists": {
+            "_id": "ObjectId",
+            "name": "str",
+            "specialization": "str",
+            "qualifications": "str",
+            "contact": "str",
+            "verified": "bool"
+        },
+        "selfcare_suggestions": {
+            "_id": "ObjectId",
+            "category": "str",
+            "type": "str",
+            "title": "str",
+            "description": "str"
+        }
+    }
+}

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Self-Care Suggestions</title>
+    <style>
+        body {
+            display: flex;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #ffdde1, #ee9ca7);
+            margin: 0;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 250px;
+            background: #ffb6c1;
+            padding: 20px;
+            box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.2);
+        }
+        .sidebar h2 {
+            text-align: center;
+            color: #fff;
+        }
+        .sidebar button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            background: #ff4d6d;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .sidebar button:hover {
+            background: #ff1e4d;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            margin: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        .resource-item {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .save-btn {
+            background: #ff4d6d;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+        .todo-item, .notification-item {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .todo-text {
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .todo-buttons {
+            display: flex;
+            gap: 10px; /* Space between buttons */
+        }
+
+        /* Common button styling */
+        .todo-buttons button {
+            padding: 6px 12px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Delete Button */
+        .delete-btn {
+            background: #ff4d4d;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #d4002a;
+        }
+
+        /* Set Reminder Button */
+        .reminder-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .reminder-btn:hover {
+            background: #388E3C;
+        }
+
+        /* Reminder message */
+        .reminder-msg {
+            color: green;
+            font-size: 14px;
+            font-weight: bold;
+            margin-left: 10px;
+            display: none; /* Initially hidden */
+        }
+
+        /* Reminder Popup */
+        .reminder-popup {
+            position: absolute;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .reminder-popup input {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+
+
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Menu</h2>
+        <button onclick="showSection('resources')">Resources</button>
+        <button onclick="showSection('todo')">To-Do List</button>
+        <button onclick="showSection('notifications')">Notifications</button>
+        <button onclick="window.location.href='/dashboard'">Go to Dashboard</button>
+    </div>
+
+    <div class="content" id="resources">
+        <h2>Recommended Resources for <span id="categoryName"></span></h2>
+        <div id="resourceList"></div>
+    </div>
+
+    <div class="content" id="todo" style="display: none;">
+        <h2>Your To-Do List</h2>
+        <ul id="todoList"></ul>
+    </div>
+    
+    <div class="content" id="notifications" style="display: none;">
+        <h2>Notifications</h2>
+        
+        <h3>Pending Notifications</h3>
+        <ul id="pendingNotifications"></ul>
+        
+        <h3>Completed Notifications</h3>
+        <ul id="completedNotifications"></ul>
+    </div>
+    
+
+    <script>
+        function showSection(section) {
+            document.getElementById('resources').style.display = 'none';
+            document.getElementById('todo').style.display = 'none';
+            document.getElementById('notifications').style.display = 'none';
+            document.getElementById(section).style.display = 'block';
+        }
+
+        function saveToDo(item, button) {
+            const list = document.getElementById('todoList');
+            const li = document.createElement('li');
+            li.classList.add("todo-item"); // Apply modern styling
+            
+            li.innerHTML = `
+                <span class="todo-text">${item}</span>
+                <div class="todo-buttons">
+                    <button class="reminder-btn" onclick="setReminder('${item}', this)">⏰ Set Reminder</button>
+                    <button class="delete-btn" onclick="deleteToDo(this)">❌ Delete</button>
+                </div>
+            `;
+            list.appendChild(li);
+
+            // Show 'Saved ✅' beside the button for 1 sec
+            let savedMsg = button.nextElementSibling;
+            if (!savedMsg || !savedMsg.classList.contains("saved-msg")) {
+                savedMsg = document.createElement("span");
+                savedMsg.classList.add("saved-msg");
+                savedMsg.style.color = "green";
+                savedMsg.style.marginLeft = "10px";
+                savedMsg.textContent = "Saved ✅";
+                button.parentNode.appendChild(savedMsg);
+            }
+            savedMsg.style.display = "inline";
+            setTimeout(() => {
+                savedMsg.style.display = "none";
+            }, 1000);
+        }
+        function deleteToDo(button) {
+            button.parentElement.remove();
+        }
+        function setReminder(item, button) {
+            // Remove any existing popups before creating a new one
+            const existingPopup = document.querySelector(".reminder-popup");
+            if (existingPopup) existingPopup.remove();
+
+            // Create a popup for selecting date & time
+            const reminderPopup = document.createElement("div");
+            reminderPopup.classList.add("reminder-popup");
+            reminderPopup.innerHTML = `
+                <label>Select Reminder Time:</label>
+                <input type="datetime-local" id="reminderTime">
+                <button onclick="saveReminder('${item}', this)">✔ Set</button>
+                <button onclick="closeReminderPopup(this)">❌ Cancel</button>
+            `;
+
+            // Append the popup next to the button
+            button.parentNode.appendChild(reminderPopup);
+        }
+
+        // Function to save the reminder
+        function saveReminder(item, button) {
+            const reminderTime = button.previousElementSibling.value; // Get selected time
+            if (!reminderTime) {
+                alert("Please select a time!");
+                return;
+            }
+
+            // Send reminder to backend
+            fetch("/add_reminder", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: item, time: reminderTime })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Add the reminder to the notifications section
+                    const notificationList = document.getElementById("notificationsList");
+                    const li = document.createElement("li");
+                    li.classList.add("notification-item");
+                    li.innerHTML = `
+                        <span>${item} - Reminder set for ${reminderTime}</span>
+                        <button class="delete-btn" onclick="deleteNotification(this)">❌ Delete</button>
+                    `;
+                    notificationList.appendChild(li);
+
+                    // Show success message
+                    const msg = document.createElement("span");
+                    msg.textContent = "✔ Reminder Set!";
+                    msg.style.color = "green";
+                    msg.style.marginLeft = "10px";
+                    msg.style.fontWeight = "bold";
+                    button.parentNode.after(msg);
+
+                    // Remove message after 1 second
+                    setTimeout(() => {
+                        msg.remove();
+                    }, 1000);
+
+                    // Close the popup
+                    button.parentNode.remove();
+                } else {
+                    alert("Failed to set reminder. Try again.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Error setting reminder.");
+            });
+        }
+
+
+        // Function to close the reminder popup
+        function closeReminderPopup(button) {
+            button.parentNode.remove();
+        }
+
+
+        // Delete Notification
+        function deleteNotification(button) {
+            button.parentElement.remove();
+        }
+
+
+        // Fetch and display resources dynamically
+        async function loadResources() {
+            const params = new URLSearchParams(window.location.search);
+            const category = params.get("category");
+
+            if (!category) {
+                document.getElementById("resourceList").innerHTML = "<p>No category selected.</p>";
+                return;
+            }
+
+            document.getElementById("categoryName").textContent = category;
+
+            try {
+                const response = await fetch(`/get_resources?category=${category}`);
+                const data = await response.json();
+
+                let htmlContent = "";
+
+                if (data.resources) {
+                    if (data.resources.activities.length) {
+                        htmlContent += "<h3>Activities</h3>";
+                        data.resources.activities.forEach(activity => {
+                            htmlContent += `<div class="resource-item">
+                                <p>${activity}</p>
+                                <button class="save-btn" onclick="saveToDo('${activity}', this)">Save</button>
+                                <span class="saved-msg" style="color: green; font-weight: bold; display: none;">Saved ✅</span>
+
+                            </div>`;
+                        });
+                    }
+
+                    if (data.resources.exercises.length) {
+                        htmlContent += "<h3>Exercises</h3>";
+                        data.resources.exercises.forEach(exercise => {
+                            htmlContent += `<div class="resource-item">
+                                <p>${exercise}</p>
+                                <button class="save-btn" onclick="saveToDo('${exercise}', this)">Save</button>
+                                <span class="saved-msg" style="color: green; font-weight: bold; display: none;">Saved ✅</span>
+                            </div>`;
+                        });
+                    }
+
+                    if (data.resources.youtube_videos.length) {
+                        htmlContent += "<h3>YouTube Videos</h3>";
+                        data.resources.youtube_videos.forEach(video => {
+                            htmlContent += `<div class="resource-item">
+                                <h3>${video.title}</h3>
+                                <a href="${video.url}" target="_blank">Watch here</a>
+                                <button class="save-btn" onclick="saveToDo('${video.title}', this)">Save</button>
+                                <span class="saved-msg" style="color: green; font-weight: bold; display: none;">Saved ✅</span>
+                            </div>`;
+                        });
+                    }
+
+                    if (data.resources.articles.length) {
+                        htmlContent += "<h3>Articles</h3>";
+                        data.resources.articles.forEach(article => {
+                            htmlContent += `<div class="resource-item">
+                                <h3>${article.title}</h3>
+                                <a href="${article.url}" target="_blank">Read here</a>
+                                <button class="save-btn" onclick="saveToDo('${article.title}', this)">Save</button>
+                                <span class="saved-msg" style="color: green; font-weight: bold; display: none;">Saved ✅</span>
+                            </div>`;
+                        });
+                    }
+
+                    if (data.resources.books.length) {
+                        htmlContent += "<h3>Books</h3>";
+                        data.resources.books.forEach(book => {
+                            htmlContent += `<div class="resource-item">
+                                <h3>${book.title}</h3>
+                                <a href="${book.url}" target="_blank">View here</a>
+                                <button class="save-btn" onclick="saveToDo('${book.title}', this)">Save</button>
+                                <span class="saved-msg" style="color: green; font-weight: bold; display: none;">Saved ✅</span>
+                            </div>`;
+                        });
+                    }
+                }
+
+                document.getElementById("resourceList").innerHTML = htmlContent;
+            } catch (error) {
+                console.error("Error fetching resources:", error);
+                document.getElementById("resourceList").innerHTML = "<p>Failed to load resources.</p>";
+            }
+        }
+
+        window.onload = loadResources;
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            loadTodos();
+            loadNotifications();
+        });
+        
+        // ✅ Load To-Do List from MongoDB
+        function loadTodos() {
+            fetch("/get_todos")
+                .then(response => response.json())
+                .then(todos => {
+                    const list = document.getElementById("todoList");
+                    list.innerHTML = ""; // Clear list before loading
+                    todos.forEach(todo => {
+                        addTodoToUI(todo.text);
+                    });
+                });
+        }
+        
+        // // ✅ Add To-Do to UI & Save in DB
+        // function saveToDo(item) {
+        //     fetch("/add_todo", {
+        //         method: "POST",
+        //         headers: { "Content-Type": "application/json" },
+        //         body: JSON.stringify({ text: item })
+        //     }).then(() => {
+        //         addTodoToUI(item);
+        //     });
+        // }
+        
+        // ✅ Display To-Do in UI
+        function addTodoToUI(text) {
+            const list = document.getElementById("todoList");
+            const li = document.createElement("li");
+            li.classList.add("todo-item");
+            li.innerHTML = `
+                <span>${text}</span>
+                <div class="todo-buttons">
+                    <button class="delete-btn" onclick="deleteToDo('${text}', this)">❌ Delete</button>
+                    <button class="reminder-btn" onclick="setReminder('${text}', this)">⏰ Set Reminder</button>
+                </div>
+            `;
+            list.appendChild(li);
+        }
+        
+        // ✅ Delete To-Do from UI & DB
+        function deleteToDo(item, button) {
+            fetch("/delete_todo", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: item })
+            }).then(() => {
+                button.closest("li").remove();
+            });
+        }
+        
+        // ✅ Load Notifications from MongoDB
+        function loadNotifications() {
+            fetch("/get_notifications")
+                .then(response => response.json())
+                .then(notifications => {
+                    const notificationList = document.getElementById("notificationList");
+                    notificationList.innerHTML = ""; // Clear before loading
+                    notifications.forEach(notification => {
+                        addNotificationToUI(notification.text, notification.time);
+                    });
+                });
+        }
+        
+        // ✅ Set Reminder (Popup for Date & Time)
+        // function setReminder(item, button) {
+        //     const reminderPopup = document.createElement("div");
+        //     reminderPopup.classList.add("reminder-popup");
+        //     reminderPopup.innerHTML = `
+        //         <label>Select Reminder Time:</label>
+        //         <input type="datetime-local" id="reminderTime">
+        //         <button onclick="saveReminder('${item}', this)">✔ Set</button>
+        //         <button onclick="closeReminderPopup(this)">❌ Cancel</button>
+        //     `;
+        //     button.parentNode.appendChild(reminderPopup);
+        // }
+        
+        // // ✅ Save Reminder to DB & UI
+        // function saveReminder(item, button) {
+        //     const reminderTime = document.getElementById("reminderTime").value;
+        //     fetch("/add_notification", {
+        //         method: "POST",
+        //         headers: { "Content-Type": "application/json" },
+        //         body: JSON.stringify({ text: item, time: reminderTime })
+        //     }).then(() => {
+        //         addNotificationToUI(item, reminderTime);
+        //         showReminderMessage(button.parentNode, "Reminder Set!", "green");
+        //         button.parentNode.remove();
+        //     });
+        // }
+        
+        // ✅ Add Notification to UI
+        function addNotificationToUI(text, time) {
+            const list = document.getElementById("notificationList");
+            const li = document.createElement("li");
+            li.classList.add("notification-item");
+            li.innerHTML = `<span>${text} (Reminder: ${time})</span>`;
+            list.appendChild(li);
+        }
+        
+        // ✅ Close Reminder Popup
+        function closeReminderPopup(button) {
+            button.parentNode.remove();
+        }
+        
+        // ✅ Flash Message (Success)
+        function showReminderMessage(parent, message, color) {
+            const msg = document.createElement("span");
+            msg.innerText = message;
+            msg.style.color = color;
+            msg.classList.add("reminder-msg");
+            parent.appendChild(msg);
+            setTimeout(() => { msg.remove(); }, 1000);
+        }
+        </script>
+        <script src="{{ url_for('static', filename='js/suggestion.js') }}"></script>
+
+
+</body>
+</html>

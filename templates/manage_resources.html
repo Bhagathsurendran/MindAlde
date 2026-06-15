@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Self-Care Resources - MindAIde</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --teal: #0a9396; --teal-dark: #005f73; --teal-light: #94d2bd;
+      --navy: #0d1b2a; --white: #ffffff; --light: #f3f4f6;
+      --text: #1f2937; --text-muted: #6b7280; --border: #e5e7eb;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:var(--light); min-height:100vh; }
+
+    /* NAVBAR */
+    .navbar {
+      background:var(--navy); padding:0 2rem;
+      display:flex; align-items:center; justify-content:space-between;
+      height:64px; position:sticky; top:0; z-index:100;
+      box-shadow:0 2px 12px rgba(0,0,0,0.25);
+    }
+    .nav-brand { display:flex; align-items:center; gap:0.6rem; text-decoration:none; }
+    .nav-brand i { font-size:1.3rem; color:var(--teal-light); }
+    .nav-brand span { font-size:1.2rem; font-weight:800; color:var(--white); }
+    .nav-right { display:flex; align-items:center; gap:1rem; }
+    .btn-back {
+      display:flex; align-items:center; gap:0.4rem;
+      background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
+      color:rgba(255,255,255,0.8); padding:0.45rem 1rem; border-radius:8px;
+      text-decoration:none; font-size:0.85rem; font-weight:500;
+    }
+    .btn-back:hover { background:rgba(255,255,255,0.15); }
+
+    /* MAIN */
+    .main { max-width:1100px; margin:0 auto; padding:2.5rem 1.5rem; }
+    .page-header { margin-bottom:2rem; }
+    .page-header h1 { font-size:1.6rem; font-weight:800; color:var(--text); }
+    .page-header p { color:var(--text-muted); font-size:0.95rem; margin-top:0.3rem; }
+
+    /* FLASH */
+    .flash { padding:0.8rem 1.2rem; border-radius:8px; margin-bottom:1.5rem; font-size:0.9rem; font-weight:500; }
+    .flash.success { background:#d1fae5; color:#065f46; border:1px solid #a7f3d0; }
+    .flash.danger  { background:#fee2e2; color:#7f1d1d; border:1px solid #fca5a5; }
+
+    /* ADD FORM */
+    .card {
+      background:var(--white); border-radius:16px; padding:2rem;
+      border:1px solid var(--border); margin-bottom:2rem;
+      box-shadow:0 4px 16px rgba(0,0,0,0.04);
+    }
+    .card h2 { font-size:1.1rem; font-weight:700; color:var(--text); margin-bottom:1.5rem; display:flex; align-items:center; gap:0.5rem; }
+    .card h2 i { color:var(--teal); }
+
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    .form-group { display:flex; flex-direction:column; gap:0.4rem; }
+    .form-group.full { grid-column:1/-1; }
+    label { font-size:0.85rem; font-weight:600; color:var(--text); }
+    input, select, textarea {
+      padding:0.75rem 1rem; border:1.5px solid var(--border);
+      border-radius:10px; font-family:'Inter',sans-serif; font-size:0.9rem; color:var(--text);
+      outline:none; transition:border 0.2s; background:var(--white);
+    }
+    input:focus, select:focus, textarea:focus { border-color:var(--teal); }
+    textarea { resize:vertical; min-height:80px; }
+    .btn {
+      padding:0.75rem 1.5rem; border:none; border-radius:10px;
+      font-family:'Inter',sans-serif; font-size:0.9rem; font-weight:600;
+      cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; gap:0.5rem;
+    }
+    .btn-primary { background:var(--teal); color:white; }
+    .btn-primary:hover { background:var(--teal-dark); }
+    .btn-danger { background:#fca5a5; color:#7f1d1d; }
+    .btn-danger:hover { background:#ef4444; color:white; }
+    .btn-sm { padding:0.4rem 0.9rem; font-size:0.82rem; }
+
+    /* FILTERS */
+    .filter-row { display:flex; gap:0.75rem; flex-wrap:wrap; margin-bottom:1.5rem; align-items:center; }
+    .filter-btn {
+      padding:0.4rem 1rem; border-radius:999px; border:1.5px solid var(--border);
+      background:var(--white); font-size:0.85rem; font-weight:500; cursor:pointer; color:var(--text-muted);
+      transition:all 0.2s;
+    }
+    .filter-btn.active, .filter-btn:hover { background:var(--teal); color:white; border-color:var(--teal); }
+
+    /* TABLE */
+    .table-container { overflow-x:auto; border-radius:12px; border:1px solid var(--border); }
+    table { width:100%; border-collapse:collapse; background:var(--white); }
+    thead { background:var(--light); }
+    th { padding:0.9rem 1.2rem; text-align:left; font-size:0.82rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; }
+    td { padding:0.9rem 1.2rem; font-size:0.9rem; color:var(--text); border-top:1px solid var(--border); }
+    tr:hover td { background:#f9fafb; }
+    .badge {
+      display:inline-block; padding:0.2rem 0.6rem; border-radius:999px;
+      font-size:0.75rem; font-weight:700; text-transform:capitalize;
+    }
+    .badge-activity { background:#dbeafe; color:#1d4ed8; }
+    .badge-exercise { background:#dcfce7; color:#166534; }
+    .badge-video    { background:#fce7f3; color:#9d174d; }
+    .badge-article  { background:#fef3c7; color:#92400e; }
+    .badge-book     { background:#ede9fe; color:#5b21b6; }
+    .truncate { max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .empty-row td { text-align:center; color:var(--text-muted); padding:3rem; font-size:0.95rem; }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a class="nav-brand" href="{{ url_for('auth.admin_dashboard') }}">
+      <i class="fa-solid fa-brain"></i>
+      <span>MindAIde</span>
+    </a>
+    <div class="nav-right">
+      <a href="{{ url_for('auth.admin_dashboard') }}" class="btn-back">
+        <i class="fa-solid fa-arrow-left"></i> Admin Dashboard
+      </a>
+    </div>
+  </nav>
+
+  <main class="main">
+    <div class="page-header">
+      <h1><i class="fa-solid fa-spa" style="color:var(--teal);"></i> Manage Self-Care Resources</h1>
+      <p>Add, view, and delete self-care suggestions shown to users in each mental health category.</p>
+    </div>
+
+    <!-- FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}"><i class="fa-solid fa-circle-check"></i> {{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- ADD RESOURCE FORM -->
+    <div class="card">
+      <h2><i class="fa-solid fa-plus-circle"></i> Add New Resource</h2>
+      <form action="{{ url_for('selfcare.add_resource') }}" method="POST">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="title">Title <span style="color:red">*</span></label>
+            <input type="text" id="title" name="title" required placeholder="e.g. Deep Breathing Exercise">
+          </div>
+          <div class="form-group">
+            <label for="category">Category <span style="color:red">*</span></label>
+            <select id="category" name="category" required>
+              <option value="Anxiety">Anxiety</option>
+              <option value="Depression">Depression</option>
+              <option value="Stress">Stress</option>
+              <option value="Normal">General Wellness (Normal)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="type">Type <span style="color:red">*</span></label>
+            <select id="type" name="type" required>
+              <option value="activity">Activity (Grounding / Mindfulness)</option>
+              <option value="exercise">Exercise (Physical)</option>
+              <option value="video">YouTube Video</option>
+              <option value="article">Article</option>
+              <option value="book">Book</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="link">Link / URL</label>
+            <input type="url" id="link" name="link" placeholder="https://... (required for videos, articles, books)">
+          </div>
+          <div class="form-group full">
+            <label for="description">Description / Summary</label>
+            <textarea id="description" name="description" placeholder="Short description of this resource..."></textarea>
+          </div>
+        </div>
+        <div style="margin-top:1.25rem;">
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-floppy-disk"></i> Add Resource
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- RESOURCES TABLE -->
+    <div class="card">
+      <h2><i class="fa-solid fa-list"></i> All Resources ({{ resources|length }})</h2>
+
+      <!-- CATEGORY FILTERS -->
+      <div class="filter-row">
+        <span style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">Filter:</span>
+        <a href="{{ url_for('selfcare.manage_resources') }}" class="filter-btn {{ 'active' if not selected_category }}">All</a>
+        {% for cat in ['Anxiety','Depression','Stress','Normal'] %}
+          <a href="{{ url_for('selfcare.manage_resources', category=cat) }}" class="filter-btn {{ 'active' if selected_category == cat }}">{{ cat }}</a>
+        {% endfor %}
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Category</th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Link</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if resources %}
+              {% for r in resources %}
+              <tr>
+                <td><strong>{{ r.title }}</strong></td>
+                <td>{{ r.category }}</td>
+                <td>
+                  <span class="badge badge-{{ r.type }}">{{ r.type }}</span>
+                </td>
+                <td class="truncate">{{ r.description or '—' }}</td>
+                <td>
+                  {% if r.link %}
+                    <a href="{{ r.link }}" target="_blank" style="color:var(--teal); text-decoration:none;">
+                      <i class="fa-solid fa-external-link-alt"></i> Open
+                    </a>
+                  {% else %}—{% endif %}
+                </td>
+                <td>
+                  <form action="{{ url_for('selfcare.delete_resource', resource_id=r._id | string) }}" method="POST" style="display:inline;" onsubmit="return confirm('Delete this resource?')">
+                    <button type="submit" class="btn btn-danger btn-sm">
+                      <i class="fa-solid fa-trash-can"></i> Delete
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr class="empty-row"><td colspan="6"><i class="fa-solid fa-inbox" style="font-size:2rem; display:block; margin-bottom:0.5rem; opacity:0.4;"></i>No resources found for this filter.</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
